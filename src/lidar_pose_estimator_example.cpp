@@ -59,10 +59,7 @@ int main(int argc, char** argv)
     lidar_cloud.is_dense = true;
     cout << "lidar cloud size: " << lidar_cloud.points.size() << endl;
     pcl::visualization::CloudViewer viewer("lidar_cloud");
-
-    pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
-    lidar_cloud_ptr = lidar_cloud.makeShared();
-    viewer.showCloud(lidar_cloud_ptr);
+    viewer.showCloud(lidar_cloud.makeShared());
     while(!viewer.wasStopped()){}
 
     lidar_pose_estimator estimator;
