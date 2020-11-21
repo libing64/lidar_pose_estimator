@@ -70,6 +70,7 @@ int main(int argc, char** argv)
     estimator.inject_invalid_data();//TODO remove
     estimator.remove_invalid_data();
     estimator.get_horizon_angle_range();
+    estimator.get_cloud_curvature();
 
     return 0;
 }
