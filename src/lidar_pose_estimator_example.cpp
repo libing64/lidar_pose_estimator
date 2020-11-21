@@ -10,7 +10,7 @@
 
 using namespace std;
 using namespace Eigen;
-typedef pcl::PointXYZI PointType;
+
 
 std::vector<float> read_lidar_data(const std::string filename)
 {
@@ -46,8 +46,21 @@ int main(int argc, char** argv)
         p.y = lidar_data[i+1];
         p.z = lidar_data[i+2];
         p.intensity = lidar_data[i+3];
+        lidar_cloud.push_back(p);
+
+        if (isnan(p.x) || isnan(p.y) || isnan(p.z) || isnan(p.intensity))
+        {
+            cout << "nan: " << i << endl;
+        }
     }
-    cout << "lidar data size: " << lidar_data.size() << endl;
+    lidar_cloud.height = 1;
+    lidar_cloud.width = lidar_cloud.points.size();
+    lidar_cloud.is_dense = true;
+    cout << "lidar cloud size: " << lidar_cloud.points.size() << endl;
+
+    lidar_pose_estimator estimator;
+    estimator.readin_lidar_cloud(lidar_cloud);
+    estimator.remove_invalid_data();
 
     return 0;
 }
