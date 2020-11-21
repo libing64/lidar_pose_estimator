@@ -24,12 +24,15 @@ private:
 public:
     int channel = 64;
     const float min_range = 0.1;
+    float min_angle_hori;
+    float max_angle_hori;
     pcl::PointCloud<PointType> lidar_cloud;
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
     void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud){lidar_cloud = cloud;}
     void remove_invalid_data();
+    void get_horizon_angle_range();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
@@ -66,5 +69,33 @@ void lidar_pose_estimator::remove_invalid_data()
     lidar_cloud.height = 1;
     lidar_cloud.width = j;
     lidar_cloud.is_dense = true;
+}
+
+void lidar_pose_estimator::get_horizon_angle_range()
+{
+    PointType p = lidar_cloud.points.front();
+    this->min_angle_hori = atan2(p.y, p.x);
+
+    p = lidar_cloud.points.back();
+    this->max_angle_hori = atan2(p.y, p.x);
+    cout << "horizon angle range: " << min_angle_hori << "  " << max_angle_hori << endl;
+
+    printf("horizon angle\n");
+    for (auto i = 0; i < lidar_cloud.points.size(); i++)
+    {
+        PointType p = lidar_cloud.points[i];
+        float angle = atan2(p.y, p.x);
+        printf("%f,%f,%f\n", angle, p.x, p.y);
+    }
+
+    printf("\nvertical angle\n");
+    for (auto i = 0; i < lidar_cloud.points.size(); i++)
+    {
+        PointType p = lidar_cloud.points[i];
+        float dist_hori = sqrtf(p.x * p.x + p.y * p.y);
+        float angle = atan2(p.z, dist_hori);
+        // printf("%f,", angle);
+        printf("%f,%f,%f,%f\n", angle, p.x, p.y, p.z);
+    }
 }
 #endif

@@ -6,6 +6,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 
 using namespace std;
@@ -29,7 +30,7 @@ int main(int argc, char** argv)
     char filename[1024] = {0};
     if (argc < 2)
     {
-        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000965.bin");
+        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000005.bin");
     } else 
     {
         strcpy(filename, argv[1]);
@@ -57,10 +58,14 @@ int main(int argc, char** argv)
     lidar_cloud.width = lidar_cloud.points.size();
     lidar_cloud.is_dense = true;
     cout << "lidar cloud size: " << lidar_cloud.points.size() << endl;
+    pcl::visualization::CloudViewer viewer("lidar_cloud");
+    viewer.showCloud(lidar_cloud);
+    while(!viewer.wasStopped()){}
 
     lidar_pose_estimator estimator;
     estimator.readin_lidar_cloud(lidar_cloud);
     estimator.remove_invalid_data();
+    estimator.get_horizon_angle_range();
 
     return 0;
 }
