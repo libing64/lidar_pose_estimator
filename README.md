@@ -22,3 +22,11 @@ rosless pose estimator
 ## 问题
 pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
 index 是指valid的点的index
+
+## cloud & Ptr
+```
+pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+pcl::PointCloud<pcl::PointXYZ> cloud;
+cloud=*cloud_Ptr;
+cloud_Ptr=cloud.makeShared;
+```
