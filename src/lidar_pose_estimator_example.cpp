@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 
     lidar_pose_estimator estimator;
     estimator.readin_lidar_cloud(lidar_cloud);
+    estimator.inject_invalid_data();//TODO remove
     estimator.remove_invalid_data();
     estimator.get_horizon_angle_range();
 

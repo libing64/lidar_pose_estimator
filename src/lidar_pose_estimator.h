@@ -27,11 +27,13 @@ public:
     const float min_range = 0.1;
     float min_angle_hori;
     float max_angle_hori;
+    bool vis_enable = true;
     pcl::PointCloud<PointType> lidar_cloud;
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
     void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud);//{lidar_cloud = cloud;}
+    void inject_invalid_data();
     void remove_invalid_data();
     void get_horizon_angle_range();
     void visualize_cloud();
@@ -45,6 +47,22 @@ lidar_pose_estimator::~lidar_pose_estimator()
 {
 }
 
+void lidar_pose_estimator::inject_invalid_data()
+{
+    if (lidar_cloud.points.size() > 0)
+    {
+        int index = rand() % lidar_cloud.points.size();
+        PointType p = lidar_cloud.points[index];
+        p.x = 0;
+        p.y = 0;
+        p.z = 0;
+
+        index = rand() % lidar_cloud.points.size();
+        p = lidar_cloud.points[index];
+        p.x = NAN;
+    }
+}
+
 void lidar_pose_estimator::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 { 
     //lidar_cloud = cloud; 
@@ -55,12 +73,12 @@ void lidar_pose_estimator::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 }
 void lidar_pose_estimator::remove_invalid_data()
 {
-    this->visualize_cloud();
+    //this->visualize_cloud();
     vector<int> index;
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
 
-    this->visualize_cloud();
+    //this->visualize_cloud();
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     int j = 0;
     for (auto i = 0; i < lidar_cloud.points.size(); i++)
@@ -118,12 +136,16 @@ void lidar_pose_estimator::get_horizon_angle_range()
 
 void lidar_pose_estimator::visualize_cloud()
 {
-    pcl::visualization::CloudViewer viewer("lidar_cloud");
-    pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
-    lidar_cloud_ptr = lidar_cloud.makeShared();
-    viewer.showCloud(lidar_cloud_ptr);
-    while (!viewer.wasStopped())
+    if (vis_enable)
     {
+        pcl::visualization::CloudViewer viewer("lidar_cloud");
+        pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
+        lidar_cloud_ptr = lidar_cloud.makeShared();
+        viewer.showCloud(lidar_cloud_ptr);
+        while (!viewer.wasStopped())
+        {
+        }
     }
+
 }
 #endif
