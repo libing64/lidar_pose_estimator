@@ -9,7 +9,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl_conversions/pcl_conversions.h>
-
+#include <pcl/visualization/cloud_viewer.h>
 
 using std::cout;
 using std::endl;
@@ -33,6 +33,7 @@ public:
     void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud){lidar_cloud = cloud;}
     void remove_invalid_data();
     void get_horizon_angle_range();
+    void visualize_cloud();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
@@ -73,6 +74,7 @@ void lidar_pose_estimator::remove_invalid_data()
 
 void lidar_pose_estimator::get_horizon_angle_range()
 {
+    this->visualize_cloud();
     PointType p = lidar_cloud.points.front();
     this->min_angle_hori = atan2(p.y, p.x);
 
@@ -96,6 +98,17 @@ void lidar_pose_estimator::get_horizon_angle_range()
         float angle = atan2(p.z, dist_hori);
         // printf("%f,", angle);
         printf("%f,%f,%f,%f\n", angle, p.x, p.y, p.z);
+    }
+    this->visualize_cloud();
+}
+
+void lidar_pose_estimator::visualize_cloud()
+{
+    pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
+    lidar_cloud_ptr = lidar_cloud.makeShared();
+    viewer.showCloud(lidar_cloud_ptr);
+    while (!viewer.wasStopped())
+    {
     }
 }
 #endif
