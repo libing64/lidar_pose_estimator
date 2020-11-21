@@ -10,6 +10,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/common/io.h>
 
 using std::cout;
 using std::endl;
@@ -30,7 +31,7 @@ public:
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
-    void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud){lidar_cloud = cloud;}
+    void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud);//{lidar_cloud = cloud;}
     void remove_invalid_data();
     void get_horizon_angle_range();
     void visualize_cloud();
@@ -44,28 +45,41 @@ lidar_pose_estimator::~lidar_pose_estimator()
 {
 }
 
+void lidar_pose_estimator::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
+{ 
+    //lidar_cloud = cloud; 
+    //pcl::fromPCLPointCloud2(cloud, lidar_cloud);
+    pcl::copyPointCloud(cloud, lidar_cloud);
+    //visualize_cloud();
+    
+}
 void lidar_pose_estimator::remove_invalid_data()
 {
+    this->visualize_cloud();
     vector<int> index;
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
+
+    this->visualize_cloud();
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     int j = 0;
-    for (auto i = 0; i < lidar_cloud.size(); i++)
+    for (auto i = 0; i < lidar_cloud.points.size(); i++)
     {
         PointType p = lidar_cloud.points[i];
         float dist = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
-        if (dist > min_range)
+        if (dist > min_range && j < i)
         {
             j++;
-            lidar_cloud[j] = lidar_cloud[i];
+            lidar_cloud.points[j] = lidar_cloud.points[i];
         }
     }
-    cout << "removed near data cnt: " << (lidar_cloud.size() - j) << endl;
-    if (j != lidar_cloud.size()) 
+    cout << "j: " << j << endl;
+    cout << "removed near data cnt: " << (lidar_cloud.points.size() - j) << endl;
+    if (j != lidar_cloud.points.size()) 
     {
-        lidar_cloud.resize(j);
+        lidar_cloud.points.resize(j);
     }
+    this->visualize_cloud();
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     lidar_cloud.height = 1;
     lidar_cloud.width = j;
@@ -104,6 +118,7 @@ void lidar_pose_estimator::get_horizon_angle_range()
 
 void lidar_pose_estimator::visualize_cloud()
 {
+    pcl::visualization::CloudViewer viewer("lidar_cloud");
     pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
     lidar_cloud_ptr = lidar_cloud.makeShared();
     viewer.showCloud(lidar_cloud_ptr);
