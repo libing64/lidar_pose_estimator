@@ -45,7 +45,6 @@ void lidar_pose_estimator::remove_invalid_data()
     vector<int> index;
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
-    cout << "removed nan data cnt: " << index.size() << endl;
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     int j = 0;
     for (auto i = 0; i < lidar_cloud.size(); i++)

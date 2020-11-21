@@ -17,4 +17,8 @@ The laser scanner spins at 10 frames per second, capturing approximately 100k po
 rosless pose estimator
 * readin lidar data from bin file
 * lidar feature extract
-* 
+
+
+## 问题
+pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
+index 是指valid的点的index
