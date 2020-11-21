@@ -166,11 +166,15 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(kitti_loader  src/kitti_loader.cpp)
-target_link_libraries(kitti_loader ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+# add_executable(kitti_loader  src/kitti_loader.cpp)
+# target_link_libraries(kitti_loader ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(lidar_feature_extractor  src/lidar_feature_extractor.cpp)
-target_link_libraries(lidar_feature_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+# add_executable(lidar_feature_extractor  src/lidar_feature_extractor.cpp)
+# target_link_libraries(lidar_feature_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(lidar_pose_estimator_example  src/lidar_pose_estimator_example.cpp)
+target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
 
 #############
 ## Install ##

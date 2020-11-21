@@ -12,3 +12,9 @@ Our recording platform is a Volkswagen Passat B6, which has been modified with a
 * 2 Color cameras, 1.4 Megapixels: Point Grey Flea 2 (FL2-14S3C-C)
 * 4 Varifocal lenses, 4-8 mm: Edmund Optics NT59-917
 The laser scanner spins at 10 frames per second, capturing approximately 100k points per cycle. The vertical resolution of the laser scanner is 64. The cameras are mounted approximately level with the ground plane. The camera images are cropped to a size of 1382 x 512 pixels using libdc's format 7 mode. After rectification, the images get slightly smaller. The cameras are triggered at 10 frames per second by the laser scanner (when facing forward) with shutter time adjusted dynamically (maximum shutter time: 2 ms). Our sensor setup with respect to the vehicle is illustrated in the following figure. Note that more information on calibration parameters is given in the calibration files and the development kit (see raw data section).
+
+# lidar pose estimator
+rosless pose estimator
+* readin lidar data from bin file
+* lidar feature extract
+* 

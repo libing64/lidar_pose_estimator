@@ -19,6 +19,8 @@
 #include <mutex>
 #include <queue>
 
+using namespace std;
+using namespace cv;
 
 typedef pcl::PointXYZI PointType;
 #define DEG2RAD (M_PI / 180.0)
@@ -66,8 +68,8 @@ void velodyne_points_callback(const sensor_msgs::PointCloud2ConstPtr& msg)
     int rows = channels;
     ROS_INFO_STREAM("line: " << __LINE__);
     cv::Mat depth = cv::Mat(rows, cols, CV_32F, cv::Scalar::all(0));
-    imshow("pc_raw", depth);
-    cv::waitKey(2);
+    //imshow("pc_raw", depth);
+    //cv::waitKey(2);
     ROS_INFO_STREAM("line: " << __LINE__);
     //project pc_raw to depth image
     for (int i = 0; i < pc_raw->size(); i++)
@@ -85,7 +87,7 @@ void velodyne_points_callback(const sensor_msgs::PointCloud2ConstPtr& msg)
     ROS_INFO_STREAM("line: " << __LINE__);
     // imshow("pc_raw", depth);
     // cv::waitKey(2);
-
+    cout << "depth: " << depth << endl;
 }
 
 int main(int argc, char** argv)

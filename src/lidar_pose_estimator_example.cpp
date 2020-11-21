@@ -29,9 +29,15 @@ int main(int argc, char** argv)
     char filename[1024] = {0};
     if (argc < 2)
     {
-        strcpy(filename, "~/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000965.bin");
+        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000965.bin");
+    } else 
+    {
+        strcpy(filename, argv[1]);
     }
+    cout << "filename: " << filename << endl;
     vector<float> lidar_data = read_lidar_data(filename);
+    cout << "lidar data size: " << lidar_data.size() << endl;
+
     pcl::PointCloud<PointType> lidar_cloud;
     for (int i = 0; i < lidar_data.size(); i += 4)
     {
