@@ -135,21 +135,21 @@ int main(int argc, char **argv)
         std::vector<Eigen::Vector3d> lidar_points;
         std::vector<float> lidar_intensities;
         //pcl::PointCloud<pcl::PointXYZI> laser_cloud;
-        pcl::PointCloud<pcl::PointXYZRGB> laser_cloud;
+        pcl::PointCloud<pcl::PointXYZI> laser_cloud;
         for (std::size_t i = 0; i < lidar_data.size(); i += 4)
         {
             lidar_points.emplace_back(lidar_data[i], lidar_data[i + 1], lidar_data[i + 2]);
             lidar_intensities.push_back(lidar_data[i + 3]);
 
             //pcl::PointXYZI point;
-            pcl::PointXYZRGB point;
+            pcl::PointXYZI point;
             point.x = lidar_data[i];
             point.y = lidar_data[i + 1];
             point.z = lidar_data[i + 2];
-            //point.intensity = lidar_data[i + 3];
-            point.r = lidar_data[i];
-            point.g = lidar_data[i + 1];
-            point.b = lidar_data[i + 2];
+            point.intensity = lidar_data[i + 3];
+            // point.r = lidar_data[i];
+            // point.g = lidar_data[i + 1];
+            // point.b = lidar_data[i + 2];
             laser_cloud.push_back(point);
         }
 
