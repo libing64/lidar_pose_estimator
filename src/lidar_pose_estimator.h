@@ -26,12 +26,16 @@ public:
     int channel = 64;
     const float min_range = 0.1;
     const int HALF_CURVA_LEN = 5;
+    const int splite_cnt = channel * 5;
     float min_angle_hori;
     float max_angle_hori;
     bool vis_enable = true;
 
     vector<float> curvature;
     pcl::PointCloud<PointType> lidar_cloud;
+    pcl::PointCloud<PointType> edge_points;
+    pcl::PointCloud<PointType> planar_points;
+
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
@@ -42,6 +46,7 @@ public:
     void visualize_cloud();
     void get_cloud_curvature();
     float distance(PointType pi, PointType pj);
+    void get_feature_points();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
@@ -176,8 +181,9 @@ void lidar_pose_estimator::get_cloud_curvature()
             dp(0) += (pj.x - pi.x);
             dp(1) += (pj.y - pi.y);
             dp(2) += (pj.z - pi.z);
-            curvature[i] = dp.norm();
         }
+        curvature[i] = dp.norm();
+        lidar_cloud.points[i].intensity = curvature[i];
     }
     for (int i = 0; i < HALF_CURVA_LEN; i++) curvature[i] = 0;
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++) curvature[i] = 0;
@@ -185,6 +191,17 @@ void lidar_pose_estimator::get_cloud_curvature()
     for (int i = 0; i < curvature.size(); i++)
     {
         printf("%f,", curvature[i]);
+    }
+    visualize_cloud();
+}
+
+void lidar_pose_estimator::get_feature_points()
+{
+    int seg_len = lidar_cloud.points.size() / splite_cnt;
+    for (int i = 0; i < splite_cnt; i++)
+    {
+        int left = i * seg_len;
+        int right = (i + 1) * seg_len - 1;
     }
 }
 #endif

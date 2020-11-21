@@ -30,3 +30,6 @@ pcl::PointCloud<pcl::PointXYZ> cloud;
 cloud=*cloud_Ptr;
 cloud_Ptr=cloud.makeShared;
 ```
+
+## cloud 拆分成不同的scan，然后每个scan再分组，找edge and planar point 
+直接进行分组是不是也是可以的?
