@@ -71,6 +71,7 @@ int main(int argc, char** argv)
     estimator.remove_invalid_data();
     estimator.get_horizon_angle_range();
     estimator.get_cloud_curvature();
+    estimator.get_feature_points();
 
     return 0;
 }

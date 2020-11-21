@@ -17,7 +17,7 @@ using std::endl;
 using std::vector;
 
 typedef pcl::PointXYZI PointType;
-
+bool comp(PointType pi, PointType pj) { return (pi.intensity < pj.intensity); }
 class lidar_pose_estimator
 {
 private:
@@ -44,6 +44,7 @@ public:
     void remove_invalid_data();
     void get_horizon_angle_range();
     void visualize_cloud();
+    void visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
     void get_cloud_curvature();
     float distance(PointType pi, PointType pj);
     void get_feature_points();
@@ -155,7 +156,18 @@ void lidar_pose_estimator::visualize_cloud()
         {
         }
     }
+}
 
+void lidar_pose_estimator::visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str)
+{
+    if (vis_enable)
+    {
+        pcl::visualization::CloudViewer viewer(str);
+        viewer.showCloud(ptr);
+        while (!viewer.wasStopped())
+        {
+        }
+    }
 }
 
 float lidar_pose_estimator::distance(PointType pi, PointType pj)
@@ -183,7 +195,7 @@ void lidar_pose_estimator::get_cloud_curvature()
             dp(2) += (pj.z - pi.z);
         }
         curvature[i] = dp.norm();
-        lidar_cloud.points[i].intensity = curvature[i];
+        lidar_cloud.points[i].intensity = curvature[i];//curvature visualization
     }
     for (int i = 0; i < HALF_CURVA_LEN; i++) curvature[i] = 0;
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++) curvature[i] = 0;
@@ -198,10 +210,20 @@ void lidar_pose_estimator::get_cloud_curvature()
 void lidar_pose_estimator::get_feature_points()
 {
     int seg_len = lidar_cloud.points.size() / splite_cnt;
+    edge_points.clear();
+    planar_points.clear();
     for (int i = 0; i < splite_cnt; i++)
     {
         int left = i * seg_len;
         int right = (i + 1) * seg_len - 1;
+        std::sort(lidar_cloud.points.begin() + left, lidar_cloud.points.begin() + right, comp);
+        PointType edge = *(lidar_cloud.points.begin() + left);
+        PointType planar  = *(lidar_cloud.points.begin() + right);
+        edge_points.push_back(edge);
+        planar_points.push_back(planar);
     }
+
+    visualize_cloud_data(edge_points.makeShared(), "edge");
+    visualize_cloud_data(planar_points.makeShared(), "planar");
 }
 #endif
