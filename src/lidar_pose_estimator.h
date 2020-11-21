@@ -97,7 +97,7 @@ void lidar_pose_estimator::remove_invalid_data()
     {
         lidar_cloud.points.resize(j);
     }
-    this->visualize_cloud();
+    //this->visualize_cloud();
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     lidar_cloud.height = 1;
     lidar_cloud.width = j;
@@ -106,7 +106,7 @@ void lidar_pose_estimator::remove_invalid_data()
 
 void lidar_pose_estimator::get_horizon_angle_range()
 {
-    this->visualize_cloud();
+    //this->visualize_cloud();
     PointType p = lidar_cloud.points.front();
     this->min_angle_hori = atan2(p.y, p.x);
 
@@ -119,7 +119,7 @@ void lidar_pose_estimator::get_horizon_angle_range()
     {
         PointType p = lidar_cloud.points[i];
         float angle = atan2(p.y, p.x);
-        printf("%f,%f,%f\n", angle, p.x, p.y);
+        printf("%f,", angle);
     }
 
     printf("\nvertical angle\n");
@@ -128,10 +128,9 @@ void lidar_pose_estimator::get_horizon_angle_range()
         PointType p = lidar_cloud.points[i];
         float dist_hori = sqrtf(p.x * p.x + p.y * p.y);
         float angle = atan2(p.z, dist_hori);
-        // printf("%f,", angle);
-        printf("%f,%f,%f,%f\n", angle, p.x, p.y, p.z);
+        printf("%f,", angle);
     }
-    this->visualize_cloud();
+    //this->visualize_cloud();
 }
 
 void lidar_pose_estimator::visualize_cloud()
