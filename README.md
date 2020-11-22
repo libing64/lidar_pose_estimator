@@ -1,7 +1,7 @@
 
 # 1. lidar_pose_estimator
 
-## 1.1 steps
+## 1.1 Steps
 * readin and publish lidar data
 * extract feature data (edge feature and planar feature)
 * estimate transformation between two frame
@@ -11,7 +11,21 @@
 
 ![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/lidar_pose_estimator.gif) 
 
-# 2. problems
+## 1.2 Building
+```
+cd catkin_ws/src
+git clone git@github.com:libing64/lidar_pose_estimator.git
+cd ..
+catkin_make -DCATKIN_WHITELIST_PACKAGES="lidar_pose_estimator"
+```
+## 1.3 Running with kitti dataset
+modify the dataset_folder in lidar_pose_estimator.launch 
+```
+soure devel/setup.bash
+roslaunch lidar_pose_estimator lidar_pose_estimator.launch
+```
+
+# 2. Problems
 
 ## 2.1 Conversion between PointCloud and Ptr 
 ```
