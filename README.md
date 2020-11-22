@@ -1,42 +1,34 @@
-# kitti dataset
 
-## Overview
-The odometry benchmark consists of 22 stereo sequences, saved in loss less png format: We provide 11 sequences (00-10) with ground truth trajectories for training and 11 sequences (11-21) without ground truth for evaluation. For this benchmark you may provide results using monocular or stereo visual odometry, laser-based SLAM or algorithms that combine visual and LIDAR information.
+# 1. lidar_pose_estimator
 
-## Data Collection
-Our recording platform is a Volkswagen Passat B6, which has been modified with actuators for the pedals (acceleration and brake) and the steering wheel. The data is recorded using an eight core i7 computer equipped with a RAID system, running Ubuntu Linux and a real-time database. We use the following sensors:
-
-* 1 Inertial Navigation System (GPS/IMU): OXTS RT 3003
-* 1 Laserscanner: Velodyne HDL-64E
-* 2 Grayscale cameras, 1.4 Megapixels: Point Grey Flea 2 (FL2-14S3M-C)
-* 2 Color cameras, 1.4 Megapixels: Point Grey Flea 2 (FL2-14S3C-C)
-* 4 Varifocal lenses, 4-8 mm: Edmund Optics NT59-917
-The laser scanner spins at 10 frames per second, capturing approximately 100k points per cycle. The vertical resolution of the laser scanner is 64. The cameras are mounted approximately level with the ground plane. The camera images are cropped to a size of 1382 x 512 pixels using libdc's format 7 mode. After rectification, the images get slightly smaller. The cameras are triggered at 10 frames per second by the laser scanner (when facing forward) with shutter time adjusted dynamically (maximum shutter time: 2 ms). Our sensor setup with respect to the vehicle is illustrated in the following figure. Note that more information on calibration parameters is given in the calibration files and the development kit (see raw data section).
-
-# lidar pose estimator
-rosless pose estimator
-* readin lidar data from bin file
-* lidar feature extract
+## 1.1 steps
+* readin and publish lidar data
+* extract feature data (edge feature and planar feature)
+* estimate transformation between two frame
+* update transformation
+* publish result
+* mapping
 
 
-## 问题
-pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
-index 是指valid的点的index
+# 2. problems
 
-## cloud & Ptr
+## 2.1 Conversion between PointCloud and Ptr 
 ```
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_Ptr(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PointCloud<pcl::PointXYZ> cloud;
 cloud=*cloud_Ptr;
-cloud_Ptr=cloud.makeShared;
+cloud_Ptr=cloud.makeShared();
 ```
 
-## cloud 拆分成不同的scan，然后每个scan再分组，找edge and planar point 
-直接进行分组是不是也是可以的?
 
 
-## edge_pose_graph 
+## 2.2 edge_pose_graph 
+example for pose_graph in utest/lidar_pose_graph_example.cpp
+
 ```
+rosrun lidar_pose_estimator lidar_pose_graph_example 
+
+
 groundtruth: 
 angle_axis: -1.69742 0.717996 -1.12579
 trans:    0.747958 -0.00371215    0.152399
@@ -93,8 +85,12 @@ result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
 
 ```
 
-## planar pose graph
+## 2.3 planar pose graph
+
+example for pose_graph in utest/lidar_pose_graph_example.cpp
 ```
+rosrun lidar_pose_estimator lidar_pose_graph_example 
+
 groundtruth: 
 angle_axis: -1.69742 0.717996 -1.12579
 trans:    0.747958 -0.00371215    0.152399
@@ -159,56 +155,64 @@ result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
 
 ```
 
-## kdtree
+## 2.4 kdtree
+```
+rosrun lidar_pose_estimator kdtree_example 
+K nearest neighbor search at (715.095 814.236 980.555) with K=10
+    733.488 761.876 941.759 (squared distance: 4585.04)
+    760.975 867.405 977.911 (squared distance: 4938.91)
+    663.906 735.162 979.46 (squared distance: 8874.22)
+    669.45 723.308 924.492 (squared distance: 13494.3)
+    825.581 868.644 979.364 (squared distance: 15168.8)
+    705.924 933.798 916.208 (squared distance: 18519.7)
+    574.16 836.271 972.582 (squared distance: 20412)
+    763.09 810.1 841.056 (squared distance: 21780.7)
+    710.103 697.298 885.781 (squared distance: 22681.7)
+    591.081 863.471 896.625 (squared distance: 24847.8)
+Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
+```
 
+
+# 3. TODO
 
 ## lidar pose estimator with edge point only
 
 
 ## velodyne coordinate
-direction of x y z: right-forward-up
+
 
 ## how to make the system more robust?
+- [x] cauchy loss for ceres optimization
+- [ ] position result is negative of groundtruth
+- [x] drfit fast if noly edge point for constraints, add planar points for constraints
+- [ ] reduce drift, add feature maps
+- [ ] scale not accurate
+- [x] record screen to gif
 
-* cauchy loss 对精度提升很明显， 但是姿态漂移太快了
-* 貌似求解的防线和groundtruth是反的
-* 姿态漂移比较厉害，需要planar point的约束才行？
-* planar约束对姿态约束比较明显，大大的改善了漂移问题
-* 如果要降低drift, feature map是不可少的
 
-## feature map
-project history features to current frame, 然后remove outliers
-
-* record correspondence and projection
-* remove mismatch and add that point to feature map
-
-## record screen
-byzanz
-```
-byzanz-record --help
-Usage:
-  byzanz-record [OPTION...] record your current desktop session
-
-Help Options:
-  -?, --help               Show help options
-  --help-all               Show all help options
-  --help-gtk               Show GTK+ Options
-
-Application Options:
-  -d, --duration=SECS      Duration of animation (default: 10 seconds)
-  -e, --exec=COMMAND       Command to execute and time
-  --delay=SECS             Delay before start (default: 1 second)
-  -c, --cursor             Record mouse cursor
-  -a, --audio              Record audio
-  -x, --x=PIXEL            X coordinate of rectangle to record
-  -y, --y=PIXEL            Y coordinate of rectangle to record
-  -w, --width=PIXEL        Width of recording rectangle
-  -h, --height=PIXEL       Height of recording rectangle
-  -v, --verbose            Be verbose
-  --display=DISPLAY        X display to use
-```
-
-example 
+## 4. record screen with byzanz
 ```
 byzanz-record --delay 10 -d 30
 ```
+
+
+# 5. Kitti dataset
+
+## 5.1 Overview
+The odometry benchmark consists of 22 stereo sequences, saved in loss less png format: We provide 11 sequences (00-10) with ground truth trajectories for training and 11 sequences (11-21) without ground truth for evaluation. For this benchmark you may provide results using monocular or stereo visual odometry, laser-based SLAM or algorithms that combine visual and LIDAR information.
+
+## 5.2 Data Collection
+Our recording platform is a Volkswagen Passat B6, which has been modified with actuators for the pedals (acceleration and brake) and the steering wheel. The data is recorded using an eight core i7 computer equipped with a RAID system, running Ubuntu Linux and a real-time database. We use the following sensors:
+
+* 1 Inertial Navigation System (GPS/IMU): OXTS RT 3003
+* 1 Laserscanner: Velodyne HDL-64E
+* 2 Grayscale cameras, 1.4 Megapixels: Point Grey Flea 2 (FL2-14S3M-C)
+* 2 Color cameras, 1.4 Megapixels: Point Grey Flea 2 (FL2-14S3C-C)
+* 4 Varifocal lenses, 4-8 mm: Edmund Optics NT59-917
+The laser scanner spins at 10 frames per second, capturing approximately 100k points per cycle. The vertical resolution of the laser scanner is 64. The cameras are mounted approximately level with the ground plane. The camera images are cropped to a size of 1382 x 512 pixels using libdc's format 7 mode. After rectification, the images get slightly smaller. The cameras are triggered at 10 frames per second by the laser scanner (when facing forward) with shutter time adjusted dynamically (maximum shutter time: 2 ms). Our sensor setup with respect to the vehicle is illustrated in the following figure. Note that more information on calibration parameters is given in the calibration files and the development kit (see raw data section).
+
+## 5.3 velodyne coordinate
+direction of x y z: right-forward-up
+
+
+# 6. reference
