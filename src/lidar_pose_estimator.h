@@ -25,6 +25,7 @@ public:
     //transform from lidar_prov to lidar
     Eigen::Quaterniond q;
     Eigen::Vector3d t;
+    double timestamp;
 
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
@@ -106,6 +107,7 @@ void lidar_pose_estimator::transform_update()
 
 void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
 {
+    timestamp = msg->header.stamp.toSec();
     if (lidar.lidar_cloud.points.size())
     {
         //copy current lidar data for prev 
