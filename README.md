@@ -26,7 +26,7 @@ roslaunch lidar_pose_estimator lidar_pose_estimator.launch
 ```
 
 ## 1.4 rqt_graph
-![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/ros_graph.gif) 
+![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/ros_graph.png) 
 
 
 # 2. Problems
