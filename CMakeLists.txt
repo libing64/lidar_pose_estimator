@@ -173,6 +173,10 @@ add_executable(lidar_pose_estimator_node  src/lidar_pose_estimator_node.cpp)
 target_link_libraries(lidar_pose_estimator_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 # utest examples
+add_executable(lidar_preprocessor_example  utest/lidar_preprocessor_example.cpp)
+target_link_libraries(lidar_preprocessor_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+
+
 add_executable(lidar_pose_estimator_example  utest/lidar_pose_estimator_example.cpp)
 target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 

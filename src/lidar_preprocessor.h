@@ -32,8 +32,6 @@ public:
     const float edge_point_thresh = 0.2;
     const float planar_point_thresh = 0.05;
     const float min_dist_thresh = 0.2;//min distance for selecting features
-    float min_angle_hori;
-    float max_angle_hori;
     bool vis_enable = false;
 
     vector<float> curvature;
@@ -44,13 +42,12 @@ public:
     lidar_preprocessor(/* args */);
     ~lidar_preprocessor();
 
+    void set_cloud_vis(bool vis){vis_enable = vis;}
     void readin_lidar_cloud(string filename);
     void readin_lidar_cloud(pcl::PointCloud<PointType> &cloud); //{lidar_cloud = cloud;}
-    void inject_invalid_data();
     void remove_invalid_data();
-    void get_horizon_angle_range();
-    void visualize_cloud();
-    void visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
+
+    void visualize_cloud(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
     void get_cloud_curvature();
     float distance(PointType pi, PointType pj);
     float distance(PointType p);
@@ -67,22 +64,6 @@ lidar_preprocessor::lidar_preprocessor(/* args */)
 
 lidar_preprocessor::~lidar_preprocessor()
 {
-}
-
-void lidar_preprocessor::inject_invalid_data()
-{
-    if (lidar_cloud.points.size() > 0)
-    {
-        int index = rand() % lidar_cloud.points.size();
-        PointType p = lidar_cloud.points[index];
-        p.x = 0;
-        p.y = 0;
-        p.z = 0;
-
-        index = rand() % lidar_cloud.points.size();
-        p = lidar_cloud.points[index];
-        p.x = NAN;
-    }
 }
 
 void lidar_preprocessor::readin_lidar_cloud(string filename)
@@ -110,10 +91,7 @@ void lidar_preprocessor::readin_lidar_cloud(string filename)
 }
 void lidar_preprocessor::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 {
-    //lidar_cloud = cloud;
-    //pcl::fromPCLPointCloud2(cloud, lidar_cloud);
     pcl::copyPointCloud(cloud, lidar_cloud);
-    //visualize_cloud();
 }
 void lidar_preprocessor::remove_invalid_data()
 {
@@ -145,31 +123,7 @@ void lidar_preprocessor::remove_invalid_data()
     lidar_cloud.is_dense = true;
 }
 
-void lidar_preprocessor::get_horizon_angle_range()
-{
-    PointType p = lidar_cloud.points.front();
-    this->min_angle_hori = atan2(p.y, p.x);
-
-    p = lidar_cloud.points.back();
-    this->max_angle_hori = atan2(p.y, p.x);
-    cout << "horizon angle range: " << min_angle_hori << "  " << max_angle_hori << endl;
-}
-
-void lidar_preprocessor::visualize_cloud()
-{
-    if (vis_enable)
-    {
-        pcl::visualization::CloudViewer viewer("lidar_cloud");
-        pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
-        lidar_cloud_ptr = lidar_cloud.makeShared();
-        viewer.showCloud(lidar_cloud_ptr);
-        while (!viewer.wasStopped())
-        {
-        }
-    }
-}
-
-void lidar_preprocessor::visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str)
+void lidar_preprocessor::visualize_cloud(pcl::PointCloud<PointType>::Ptr ptr, std::string str)
 {
     if (vis_enable)
     {
@@ -219,8 +173,6 @@ void lidar_preprocessor::get_cloud_curvature()
         curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++)
         curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
-
-    visualize_cloud();
 }
 
 void lidar_preprocessor::get_feature_points()
@@ -250,8 +202,8 @@ void lidar_preprocessor::get_feature_points()
         }
     }
 
-    visualize_cloud_data(edge_points.makeShared(), "edge");
-    visualize_cloud_data(planar_points.makeShared(), "planar");
+    visualize_cloud(edge_points.makeShared(), "edge");
+    visualize_cloud(planar_points.makeShared(), "planar");
 }
 
 void lidar_preprocessor::remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index)
@@ -316,17 +268,16 @@ void lidar_preprocessor::remove_neighbor_feature(pcl::PointCloud<PointType> &clo
 void lidar_preprocessor::process(string filename)
 {
     readin_lidar_cloud(filename);
-    inject_invalid_data(); //TODO remove
     remove_invalid_data();
-    get_horizon_angle_range();
     get_cloud_curvature();
     get_feature_points();
+    remove_neighbor_feature(edge_points);
+    remove_neighbor_feature(planar_points);
 }
 
 void lidar_preprocessor::process()
 {
     remove_invalid_data();
-    get_horizon_angle_range();
     get_cloud_curvature();
     get_feature_points();
     remove_neighbor_feature(edge_points);
