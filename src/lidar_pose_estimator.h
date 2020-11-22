@@ -22,6 +22,10 @@ public:
     lidar_preprocessor lidar;
     lidar_preprocessor lidar_prev;
 
+    //transform from lidar_prov to lidar
+    Eigen::Quaterniond q;
+    Eigen::Vector3d t;
+
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
@@ -77,6 +81,15 @@ void lidar_pose_estimator::transform_estimation()
     std::cout << summary.FullReport() << "\n";
 
     printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
+
+    double qq[4];
+    ceres::AngleAxisToQuaternion(pose, qq);
+    t = Eigen::Vector3d(pose[3], pose[4], pose[5]);
+
+    q.w() = qq[0];
+    q.x() = qq[1];
+    q.y() = qq[2];
+    q.z() = qq[3];
 }
 
 #endif

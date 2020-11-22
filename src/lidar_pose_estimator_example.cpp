@@ -29,11 +29,16 @@ int main(int argc, char** argv)
     }
     cout << "filename: " << filename_prev << endl << filename << endl;
 
+
+    clock_t start = clock();
     lidar_pose_estimator estimator;
     estimator.lidar_prev.process(filename_prev);
     estimator.lidar.process(filename);
 
     estimator.transform_estimation();
+
+    double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
+    cout << "cost time: " << dt << endl;
     // lidar_preprocessor lidar;
     // lidar.readin_lidar_cloud(lidar_cloud);
     // lidar.inject_invalid_data();//TODO remove
