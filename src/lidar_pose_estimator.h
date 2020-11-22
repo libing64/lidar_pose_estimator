@@ -14,6 +14,8 @@ public:
 
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
+
+    void transform_estimation();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
@@ -22,6 +24,11 @@ lidar_pose_estimator::lidar_pose_estimator(/* args */)
 
 lidar_pose_estimator::~lidar_pose_estimator()
 {
+}
+
+void lidar_pose_estimator::transform_estimation()
+{
+    //find closest point 
 }
 
 #endif
