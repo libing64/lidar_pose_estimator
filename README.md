@@ -29,6 +29,9 @@ roslaunch lidar_pose_estimator lidar_pose_estimator.launch
 ![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/ros_graph.png) 
 
 
+## 1.5 Test Environment
+Ubuntu 20.04 + ros noetic
+
 # 2. Problems
 
 ## 2.1 Conversion between PointCloud and Ptr 
