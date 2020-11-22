@@ -27,9 +27,9 @@ private:
 public:
     int channel = 64;
     const float min_range = 0.1;
-    const int HALF_CURVA_LEN = 5;
+    const int HALF_CURVA_LEN = 4;
     const int splite_cnt = channel * 5;
-    const float edge_point_thresh = 0.1;
+    const float edge_point_thresh = 0.2;
     const float planar_point_thresh = 0.05;
     float min_angle_hori;
     float max_angle_hori;
@@ -238,10 +238,10 @@ void lidar_preprocessor::get_cloud_curvature()
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++)
         curvature[i] = 0;
 
-    for (int i = 0; i < curvature.size(); i++)
-    {
-        printf("%f,", curvature[i]);
-    }
+    // for (int i = 0; i < curvature.size(); i++)
+    // {
+    //     printf("%f,", curvature[i]);
+    // }
     visualize_cloud();
 }
 

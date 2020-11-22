@@ -67,9 +67,9 @@ void lidar_pose_estimator::transform_estimation()
                                      NULL /* squared loss */,
                                      pose);
             
-            std::cout << "p: "  << p.transpose()  << std::endl;
-            std::cout << "p1: " << p1.transpose() << std::endl;
-            std::cout << "p2: " << p2.transpose() << std::endl;
+            // std::cout << "p: "  << p.transpose()  << std::endl;
+            // std::cout << "p1: " << p1.transpose() << std::endl;
+            // std::cout << "p2: " << p2.transpose() << std::endl;
         }
     }
     ceres::Solver::Options options;
