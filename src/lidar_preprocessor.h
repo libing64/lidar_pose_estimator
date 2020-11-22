@@ -33,7 +33,7 @@ public:
     const float planar_point_thresh = 0.05;
     float min_angle_hori;
     float max_angle_hori;
-    bool vis_enable = true;
+    bool vis_enable = false;
 
     vector<float> curvature;
     pcl::PointCloud<PointType> lidar_cloud;
@@ -264,7 +264,7 @@ void lidar_preprocessor::get_feature_points()
         }
         else
         {
-            printf("edge curv: %f, planer curv: %f\n", edge.intensity, planar.intensity);
+            //printf("edge curv: %f, planer curv: %f\n", edge.intensity, planar.intensity);
         }
     }
 

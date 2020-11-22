@@ -39,7 +39,7 @@ lidar_pose_estimator::~lidar_pose_estimator()
 void lidar_pose_estimator::transform_estimation()
 {
     pcl::KdTreeFLANN<PointType> kdtree;
-    kdtree.setInputCloud(lidar_prev.lidar_cloud.makeShared());
+    kdtree.setInputCloud(lidar.edge_points.makeShared());
     // K nearest neighbor search
     int K = 2;
     std::vector<int> index(K);
@@ -49,19 +49,23 @@ void lidar_pose_estimator::transform_estimation()
     double pose[6] = {0, 0, 0, 0, 0, 0}; //0-2 for roation and 3-5 for tranlation
     Problem problem;
 
-    for (int i = 0; i < lidar.lidar_cloud.points.size(); i++)
+    for (int i = 0; i < lidar_prev.edge_points.points.size(); i++)
     {
-        PointType search_point = lidar.lidar_cloud.points[i];
+        PointType search_point = lidar_prev.edge_points.points[i];
         if (kdtree.nearestKSearch(search_point, K, index, distance) == K)
         {
             //add constraints
             Eigen::Vector3d p = point2eigen(search_point);
-            Eigen::Vector3d p1 = point2eigen(lidar.lidar_cloud.points[index[0]]);
-            Eigen::Vector3d p2 = point2eigen(lidar.lidar_cloud.points[index[1]]);
+            Eigen::Vector3d p1 = point2eigen(lidar.edge_points.points[index[0]]);
+            Eigen::Vector3d p2 = point2eigen(lidar.edge_points.points[index[1]]);
             ceres::CostFunction *cost_function = lidar_edge_error::Create(p, p1, p2);
             problem.AddResidualBlock(cost_function,
                                      NULL /* squared loss */,
                                      pose);
+            
+            std::cout << "p: "  << p.transpose()  << std::endl;
+            std::cout << "p1: " << p1.transpose() << std::endl;
+            std::cout << "p2: " << p2.transpose() << std::endl;
         }
     }
     ceres::Solver::Options options;
