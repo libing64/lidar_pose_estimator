@@ -27,6 +27,8 @@ public:
     const float min_range = 0.1;
     const int HALF_CURVA_LEN = 5;
     const int splite_cnt = channel * 5;
+    const float edge_point_thresh = 0.1;
+    const float planar_point_thresh = 0.05;
     float min_angle_hori;
     float max_angle_hori;
     bool vis_enable = true;
@@ -47,6 +49,7 @@ public:
     void visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
     void get_cloud_curvature();
     float distance(PointType pi, PointType pj);
+    float distance(PointType p);
     void get_feature_points();
 };
 
@@ -179,6 +182,12 @@ float lidar_pose_estimator::distance(PointType pi, PointType pj)
     return dist;
 }
 
+float lidar_pose_estimator::distance(PointType p)
+{
+    float dist = sqrtf(p.x * p.x + p.y  * p.y + p.z * p.z);
+    return dist;
+}
+
 void lidar_pose_estimator::get_cloud_curvature()
 {
     int n = lidar_cloud.points.size();
@@ -187,6 +196,7 @@ void lidar_pose_estimator::get_cloud_curvature()
     {
         Eigen::Vector3d dp = Eigen::Vector3d::Zero();
         PointType pi = lidar_cloud.points[i];
+        float r = distance(pi);
         for (auto j = i - HALF_CURVA_LEN; j <= i + HALF_CURVA_LEN; j++)
         {
             PointType pj = lidar_cloud.points[j];
@@ -194,7 +204,7 @@ void lidar_pose_estimator::get_cloud_curvature()
             dp(1) += (pj.y - pi.y);
             dp(2) += (pj.z - pi.z);
         }
-        curvature[i] = dp.norm();
+        curvature[i] = dp.norm() / r;
         lidar_cloud.points[i].intensity = curvature[i];//curvature visualization
     }
     for (int i = 0; i < HALF_CURVA_LEN; i++) curvature[i] = 0;
@@ -217,10 +227,17 @@ void lidar_pose_estimator::get_feature_points()
         int left = i * seg_len;
         int right = (i + 1) * seg_len - 1;
         std::sort(lidar_cloud.points.begin() + left, lidar_cloud.points.begin() + right, comp);
-        PointType edge = *(lidar_cloud.points.begin() + left);
-        PointType planar  = *(lidar_cloud.points.begin() + right);
-        edge_points.push_back(edge);
-        planar_points.push_back(planar);
+        PointType edge = *(lidar_cloud.points.begin() + right);
+        PointType planar  = *(lidar_cloud.points.begin() + left);
+        if (edge.intensity > edge_point_thresh && planar.intensity < planar_point_thresh)
+        {
+            edge_points.push_back(edge);
+            planar_points.push_back(planar); 
+        } else 
+        {
+            printf("edge curv: %f, planer curv: %f\n", edge.intensity, planar.intensity);
+        }
+
     }
 
     visualize_cloud_data(edge_points.makeShared(), "edge");
