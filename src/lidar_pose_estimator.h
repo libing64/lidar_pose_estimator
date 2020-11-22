@@ -30,18 +30,20 @@ public:
     ~lidar_pose_estimator();
 
     void update(const sensor_msgs::PointCloud2ConstPtr &msg);
-    void transform_estimation();
+    void transform_update();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
 {
+    q = Eigen::Quaterniond::Identity();
+    t = Eigen::Vector3d::Zero();
 }
 
 lidar_pose_estimator::~lidar_pose_estimator()
 {
 }
 
-void lidar_pose_estimator::transform_estimation()
+void lidar_pose_estimator::transform_update()
 {
     std::cout << "edge point size prev: " << lidar_prev.lidar_cloud.points.size() << std::endl;
     std::cout << "edge point size: " << lidar.lidar_cloud.points.size() << std::endl;
@@ -70,10 +72,6 @@ void lidar_pose_estimator::transform_estimation()
             problem.AddResidualBlock(cost_function,
                                      NULL /* squared loss */,
                                      pose);
-            
-            // std::cout << "p: "  << p.transpose()  << std::endl;
-            // std::cout << "p1: " << p1.transpose() << std::endl;
-            // std::cout << "p2: " << p2.transpose() << std::endl;
         }
     }
     ceres::Solver::Options options;
@@ -86,14 +84,24 @@ void lidar_pose_estimator::transform_estimation()
 
     printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
 
+    Eigen::Quaterniond dq;
+    Eigen::Vector3d dt;
+
     double qq[4];
     ceres::AngleAxisToQuaternion(pose, qq);
-    t = Eigen::Vector3d(pose[3], pose[4], pose[5]);
+    dt = Eigen::Vector3d(pose[3], pose[4], pose[5]);
 
-    q.w() = qq[0];
-    q.x() = qq[1];
-    q.y() = qq[2];
-    q.z() = qq[3];
+    dq.w() = qq[0];
+    dq.x() = qq[1];
+    dq.y() = qq[2];
+    dq.z() = qq[3];
+
+    //update transformation
+    Eigen::Quaterniond dq_inv = dq.inverse();
+    Eigen::Vector3d dt_inv = -dq_inv.toRotationMatrix() * dt;
+
+    t += q.toRotationMatrix() * dt;
+    q *= dq_inv;
 }
 
 void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
@@ -114,12 +122,8 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
 
     if (lidar_prev.lidar_cloud.points.size() && lidar.lidar_cloud.points.size())
     {
-        transform_estimation();
-    } else
-    {
-        //init lidar pose
-    }
-    
+        transform_update();
+    } 
 }
 
 #endif

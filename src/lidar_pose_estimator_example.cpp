@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     estimator.lidar_prev.process(filename_prev);
     estimator.lidar.process(filename);
 
-    estimator.transform_estimation();
+    estimator.transform_update();
 
     double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
     cout << "cost time: " << dt << endl;
