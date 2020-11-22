@@ -22,7 +22,11 @@ int main(int argc, char** argv)
     {
         P_proj.col(i) = R * P.col(i) + t;
     }
+    AngleAxisd angle_axis = AngleAxisd(q);
 
+    std::cout << "groundtruth: " << std::endl
+              << "angle_axis: " << angle_axis.angle() * angle_axis.axis().transpose() << std::endl
+              << "trans: " << t.transpose() << endl;
     double pose[6] = {0, 0, 0, 0, 0, 0};//0-2 for roation and 3-5 for tranlation
     Problem problem;
     for (int i = 0; i < n; i++)
@@ -42,6 +46,8 @@ int main(int argc, char** argv)
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
     std::cout << summary.FullReport() << "\n";
+
+    printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
 
     return 0;
 }
