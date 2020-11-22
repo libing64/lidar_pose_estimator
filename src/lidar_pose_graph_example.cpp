@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         Vector3d p2 = P_proj.col( (i + 1) % n);
         ceres::CostFunction *cost_function = lidar_edge_error::Create(p, p1, p2);
         problem.AddResidualBlock(cost_function,
-                                 NULL /* squared loss */,
+                                 new CauchyLoss(0.5),
                                  pose);
     }
     ceres::Solver::Options options;

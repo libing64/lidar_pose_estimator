@@ -71,7 +71,7 @@ void lidar_pose_estimator::transform_update()
             Eigen::Vector3d p2 = point2eigen(lidar.edge_points.points[index[1]]);
             ceres::CostFunction *cost_function = lidar_edge_error::Create(p, p1, p2);
             problem.AddResidualBlock(cost_function,
-                                     NULL /* squared loss */,
+                                     new CauchyLoss(0.5),
                                      pose);
         }
     }

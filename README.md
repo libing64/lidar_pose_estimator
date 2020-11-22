@@ -97,3 +97,9 @@ result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
 
 
 ## lidar pose estimator with edge point only
+
+
+## velodyne coordinate
+direction of x y z: right-forward-up
+
+## how to make the system more robust?
