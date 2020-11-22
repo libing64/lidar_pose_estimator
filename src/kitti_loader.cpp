@@ -141,15 +141,11 @@ int main(int argc, char **argv)
             lidar_points.emplace_back(lidar_data[i], lidar_data[i + 1], lidar_data[i + 2]);
             lidar_intensities.push_back(lidar_data[i + 3]);
 
-            //pcl::PointXYZI point;
             pcl::PointXYZI point;
             point.x = lidar_data[i];
             point.y = lidar_data[i + 1];
             point.z = lidar_data[i + 2];
             point.intensity = lidar_data[i + 3];
-            // point.r = lidar_data[i];
-            // point.g = lidar_data[i + 1];
-            // point.b = lidar_data[i + 2];
             laser_cloud.push_back(point);
         }
 

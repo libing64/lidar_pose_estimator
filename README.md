@@ -9,6 +9,7 @@
 * publish result
 * mapping
 
+![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/lidar_pose_estimator.gif) 
 
 # 2. problems
 
