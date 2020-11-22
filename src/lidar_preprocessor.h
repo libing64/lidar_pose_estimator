@@ -31,7 +31,7 @@ public:
     const int splite_cnt = channel * 5;
     const float edge_point_thresh = 0.2;
     const float planar_point_thresh = 0.05;
-    const float min_dist_thresh = 0.5;//min distance for selecting features
+    const float min_dist_thresh = 0.2;//min distance for selecting features
     float min_angle_hori;
     float max_angle_hori;
     bool vis_enable = false;
@@ -55,6 +55,8 @@ public:
     float distance(PointType pi, PointType pj);
     float distance(PointType p);
     void get_feature_points();
+    void remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index);
+    void remove_neighbor_feature(pcl::PointCloud<PointType> &cloud);
     void process(string filename);
     void process();
 };
@@ -115,33 +117,31 @@ void lidar_preprocessor::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 }
 void lidar_preprocessor::remove_invalid_data()
 {
-    //this->visualize_cloud();
-    vector<int> index;
+    vector<int> valid_index(lidar_cloud.points.size());
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
-    pcl::removeNaNFromPointCloud(lidar_cloud, lidar_cloud, index);
-
-    //this->visualize_cloud();
-    cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
-    int j = 0;
     for (auto i = 0; i < lidar_cloud.points.size(); i++)
     {
         PointType p = lidar_cloud.points[i];
-        float dist = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
-        if (dist > min_range && j < i)
+        if (isnan(p.x) || isnan(p.y) || isnan(p.z))
         {
-            j++;
-            lidar_cloud.points[j] = lidar_cloud.points[i];
+            valid_index[i] = 0;
+        } else 
+        {
+            float dist = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
+            if (dist < min_range)
+            {
+                valid_index[i] = 0;
+            } else 
+            {
+                valid_index[i] = 1;
+            }
         }
+
     }
-    cout << "j: " << j << endl;
-    cout << "removed near data cnt: " << (lidar_cloud.points.size() - j) << endl;
-    if (j != lidar_cloud.points.size())
-    {
-        lidar_cloud.points.resize(j);
-    }
+    remove_invalid_points(lidar_cloud, valid_index);
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     lidar_cloud.height = 1;
-    lidar_cloud.width = j;
+    lidar_cloud.width = lidar_cloud.points.size();
     lidar_cloud.is_dense = true;
 }
 
@@ -253,6 +253,66 @@ void lidar_preprocessor::get_feature_points()
     visualize_cloud_data(edge_points.makeShared(), "edge");
     visualize_cloud_data(planar_points.makeShared(), "planar");
 }
+
+void lidar_preprocessor::remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index)
+{
+    std::cout << "cloud size 1: " << cloud.points.size() << std::endl;
+    int j = 0;
+    for (auto i = 0; i < cloud.points.size(); i++)
+    {
+        if (valid_index[i])
+        {
+            j++;
+            if (j < i)
+            {
+                cloud.points[j] = cloud.points[i];
+            }
+
+        }
+    }
+    if (j != cloud.points.size())
+    {
+        cloud.points.resize(j);
+    }
+    std::cout << "cloud size 2: " << cloud.points.size() << std::endl;
+}
+
+void lidar_preprocessor::remove_neighbor_feature(pcl::PointCloud<PointType> &cloud)
+{
+    if (cloud.points.empty()) return;
+    vector<int> valid_index(cloud.points.size());
+    for (int i = 0; i < valid_index.size(); i++)
+    {
+        valid_index[i] = 1;
+    }
+    //remove neighbor feature with kdtree
+    pcl::KdTreeFLANN<PointType> kdtree;
+    kdtree.setInputCloud(cloud.makeShared());
+    std::vector<int> index;
+    std::vector<float> distance;
+
+    float radius = min_dist_thresh;
+    for (int i = 0; i < cloud.size(); i++)
+    {
+        if (valid_index[i])
+        {
+            PointType search_point = cloud.points[i];
+            if (kdtree.radiusSearch(search_point, radius, index, distance) > 0)
+            {
+                //remove neighbor points
+                for (int j = 0; j < index.size(); j++)
+                {
+                    if (index[j] != i)
+                    {
+                        valid_index[index[j]] = 0;
+                    }
+                }
+            }
+        }
+    }
+    remove_invalid_points(cloud, valid_index);
+
+}
 void lidar_preprocessor::process(string filename)
 {
     readin_lidar_cloud(filename);
@@ -269,6 +329,8 @@ void lidar_preprocessor::process()
     get_horizon_angle_range();
     get_cloud_curvature();
     get_feature_points();
+    remove_neighbor_feature(edge_points);
+    remove_neighbor_feature(planar_points);
 }
 
 #endif

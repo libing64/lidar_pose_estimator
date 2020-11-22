@@ -46,10 +46,8 @@ lidar_pose_estimator::~lidar_pose_estimator()
 
 void lidar_pose_estimator::transform_update()
 {
-    std::cout << "edge point size prev: " << lidar_prev.lidar_cloud.points.size() << std::endl;
-    std::cout << "edge point size: " << lidar.lidar_cloud.points.size() << std::endl;
-
-
+    std::cout << "edge point size prev: " << lidar_prev.edge_points.points.size() << std::endl;
+    std::cout << "edge point size: " << lidar.edge_points.points.size() << std::endl;
 
     //ceres optimization
     double pose[6] = {0, 0, 0, 0, 0, 0}; //0-2 for roation and 3-5 for tranlation
