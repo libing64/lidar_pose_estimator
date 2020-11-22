@@ -29,6 +29,7 @@ public:
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 
+    void update(const sensor_msgs::PointCloud2ConstPtr &msg);
     void transform_estimation();
 };
 
@@ -42,6 +43,9 @@ lidar_pose_estimator::~lidar_pose_estimator()
 
 void lidar_pose_estimator::transform_estimation()
 {
+    std::cout << "edge point size prev: " << lidar_prev.lidar_cloud.points.size() << std::endl;
+    std::cout << "edge point size: " << lidar.lidar_cloud.points.size() << std::endl;
+
     pcl::KdTreeFLANN<PointType> kdtree;
     kdtree.setInputCloud(lidar.edge_points.makeShared());
     // K nearest neighbor search
@@ -90,6 +94,32 @@ void lidar_pose_estimator::transform_estimation()
     q.x() = qq[1];
     q.y() = qq[2];
     q.z() = qq[3];
+}
+
+void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
+{
+    if (lidar.lidar_cloud.points.size())
+    {
+        //copy current lidar data for prev 
+        lidar_prev.lidar_cloud.clear();
+        lidar_prev.edge_points.clear();
+        lidar_prev.planar_points.clear();
+
+        lidar_prev.lidar_cloud = lidar.lidar_cloud;
+        lidar_prev.edge_points = lidar.edge_points;
+        lidar_prev.planar_points = lidar.planar_points;
+    }
+    pcl::fromROSMsg(*msg, lidar.lidar_cloud);
+    lidar.process();
+
+    if (lidar_prev.lidar_cloud.points.size() && lidar.lidar_cloud.points.size())
+    {
+        transform_estimation();
+    } else
+    {
+        //init lidar pose
+    }
+    
 }
 
 #endif

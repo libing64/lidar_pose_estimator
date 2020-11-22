@@ -55,6 +55,7 @@ public:
     float distance(PointType p);
     void get_feature_points();
     void process(string filename);
+    void process();
 };
 
 lidar_preprocessor::lidar_preprocessor(/* args */)
@@ -275,6 +276,14 @@ void lidar_preprocessor::process(string filename)
 {
     readin_lidar_cloud(filename);
     inject_invalid_data(); //TODO remove
+    remove_invalid_data();
+    get_horizon_angle_range();
+    get_cloud_curvature();
+    get_feature_points();
+}
+
+void lidar_preprocessor::process()
+{
     remove_invalid_data();
     get_horizon_angle_range();
     get_cloud_curvature();

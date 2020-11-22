@@ -9,7 +9,8 @@
                 "/opt/ros/noetic",
                 "/usr/include/pcl-1.10",
                 "src",
-                "/usr/include/ceres"
+                "/usr/include/ceres",
+                "/usr/include/vtk-7.1"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
