@@ -65,13 +65,13 @@ int main(int argc, char** argv)
     // viewer.showCloud(lidar_cloud_ptr);
     // while(!viewer.wasStopped()){}
 
-    lidar_pose_estimator estimator;
-    estimator.readin_lidar_cloud(lidar_cloud);
-    estimator.inject_invalid_data();//TODO remove
-    estimator.remove_invalid_data();
-    estimator.get_horizon_angle_range();
-    estimator.get_cloud_curvature();
-    estimator.get_feature_points();
+    lidar_preprocessor lidar;
+    lidar.readin_lidar_cloud(lidar_cloud);
+    lidar.inject_invalid_data();//TODO remove
+    lidar.remove_invalid_data();
+    lidar.get_horizon_angle_range();
+    lidar.get_cloud_curvature();
+    lidar.get_feature_points();
 
     return 0;
 }

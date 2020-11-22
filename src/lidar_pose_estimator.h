@@ -18,7 +18,7 @@ using std::vector;
 
 typedef pcl::PointXYZI PointType;
 bool comp(PointType pi, PointType pj) { return (pi.intensity < pj.intensity); }
-class lidar_pose_estimator
+class lidar_preprocessor
 {
 private:
     /* data */
@@ -38,8 +38,8 @@ public:
     pcl::PointCloud<PointType> edge_points;
     pcl::PointCloud<PointType> planar_points;
 
-    lidar_pose_estimator(/* args */);
-    ~lidar_pose_estimator();
+    lidar_preprocessor(/* args */);
+    ~lidar_preprocessor();
 
     void readin_lidar_cloud(pcl::PointCloud<PointType>& cloud);//{lidar_cloud = cloud;}
     void inject_invalid_data();
@@ -53,15 +53,15 @@ public:
     void get_feature_points();
 };
 
-lidar_pose_estimator::lidar_pose_estimator(/* args */)
+lidar_preprocessor::lidar_preprocessor(/* args */)
 {
 }
 
-lidar_pose_estimator::~lidar_pose_estimator()
+lidar_preprocessor::~lidar_preprocessor()
 {
 }
 
-void lidar_pose_estimator::inject_invalid_data()
+void lidar_preprocessor::inject_invalid_data()
 {
     if (lidar_cloud.points.size() > 0)
     {
@@ -77,7 +77,7 @@ void lidar_pose_estimator::inject_invalid_data()
     }
 }
 
-void lidar_pose_estimator::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
+void lidar_preprocessor::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 { 
     //lidar_cloud = cloud; 
     //pcl::fromPCLPointCloud2(cloud, lidar_cloud);
@@ -85,7 +85,7 @@ void lidar_pose_estimator::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
     //visualize_cloud();
     
 }
-void lidar_pose_estimator::remove_invalid_data()
+void lidar_preprocessor::remove_invalid_data()
 {
     //this->visualize_cloud();
     vector<int> index;
@@ -118,7 +118,7 @@ void lidar_pose_estimator::remove_invalid_data()
     lidar_cloud.is_dense = true;
 }
 
-void lidar_pose_estimator::get_horizon_angle_range()
+void lidar_preprocessor::get_horizon_angle_range()
 {
     //this->visualize_cloud();
     PointType p = lidar_cloud.points.front();
@@ -147,7 +147,7 @@ void lidar_pose_estimator::get_horizon_angle_range()
     //this->visualize_cloud();
 }
 
-void lidar_pose_estimator::visualize_cloud()
+void lidar_preprocessor::visualize_cloud()
 {
     if (vis_enable)
     {
@@ -161,7 +161,7 @@ void lidar_pose_estimator::visualize_cloud()
     }
 }
 
-void lidar_pose_estimator::visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str)
+void lidar_preprocessor::visualize_cloud_data(pcl::PointCloud<PointType>::Ptr ptr, std::string str)
 {
     if (vis_enable)
     {
@@ -173,7 +173,7 @@ void lidar_pose_estimator::visualize_cloud_data(pcl::PointCloud<PointType>::Ptr 
     }
 }
 
-float lidar_pose_estimator::distance(PointType pi, PointType pj)
+float lidar_preprocessor::distance(PointType pi, PointType pj)
 {
     float dx = pi.x - pj.x;
     float dy = pi.y - pj.y;
@@ -182,13 +182,13 @@ float lidar_pose_estimator::distance(PointType pi, PointType pj)
     return dist;
 }
 
-float lidar_pose_estimator::distance(PointType p)
+float lidar_preprocessor::distance(PointType p)
 {
     float dist = sqrtf(p.x * p.x + p.y  * p.y + p.z * p.z);
     return dist;
 }
 
-void lidar_pose_estimator::get_cloud_curvature()
+void lidar_preprocessor::get_cloud_curvature()
 {
     int n = lidar_cloud.points.size();
     curvature.resize(n);
@@ -217,7 +217,7 @@ void lidar_pose_estimator::get_cloud_curvature()
     visualize_cloud();
 }
 
-void lidar_pose_estimator::get_feature_points()
+void lidar_preprocessor::get_feature_points()
 {
     int seg_len = lidar_cloud.points.size() / splite_cnt;
     edge_points.clear();
