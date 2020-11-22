@@ -173,7 +173,7 @@ include_directories(
 # target_link_libraries(lidar_feature_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(lidar_pose_estimator_example  src/lidar_pose_estimator_example.cpp)
-target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 
 add_executable(kdtree_example  src/kdtree_example.cpp)

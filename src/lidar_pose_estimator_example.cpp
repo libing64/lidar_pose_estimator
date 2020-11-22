@@ -33,6 +33,7 @@ int main(int argc, char** argv)
     estimator.lidar_prev.process(filename_prev);
     estimator.lidar.process(filename);
 
+    estimator.transform_estimation();
     // lidar_preprocessor lidar;
     // lidar.readin_lidar_cloud(lidar_cloud);
     // lidar.inject_invalid_data();//TODO remove
