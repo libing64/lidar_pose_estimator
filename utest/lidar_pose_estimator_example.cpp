@@ -20,8 +20,8 @@ int main(int argc, char** argv)
     char filename[1024] = {0};
     if (argc < 3)
     {
-        strcpy(filename_prev, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000100.bin");
-        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000120.bin");
+        strcpy(filename_prev, "/home/libing/data/kitti_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000100.bin");
+        strcpy(filename, "/home/libing/data/kitti_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000120.bin");
     } else 
     {
         strcpy(filename_prev, argv[1]);
