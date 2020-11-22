@@ -2,7 +2,8 @@
 #define _LIDAR_POSE_GRAPH_H
 
 #include <ceres/ceres.h>
-#include "ceres/dynamic_autodiff_cost_function.h"
+#include <ceres/rotation.h>
+#include <ceres/dynamic_autodiff_cost_function.h>
 #include <Eigen/Eigen>
 
 using ceres::AutoDiffCostFunction;
@@ -13,6 +14,8 @@ using ceres::LossFunction;
 using ceres::Problem;
 using ceres::Solve;
 using ceres::Solver;
+using ceres::AngleAxisRotatePoint;
+using ceres::CrossProduct;
 
 //parameters: rotation and translation
 //rotation in angleAxis format
@@ -27,7 +30,11 @@ struct lidar_edge_error
                     T *residuals) const
     {
         // pose[0,1,2] are the angle-axis rotation.
-        T pi[3] = {p(0), p(1), p(2)};
+        T pi[3];
+        pi[0] = T(p(0));
+        pi[1] = T(p(1));
+        pi[2] = T(p(2));
+
         T pi_proj[3];//project pi to current frame
         AngleAxisRotatePoint(pose, pi, pi_proj);
 
@@ -37,18 +44,18 @@ struct lidar_edge_error
         pi_proj[2] += pose[5];
 
         //distance between pi_proj to line(p1, p2)
-        T d1[3], d2[3], d12;
-        d1[0] = pi_proj[0] - p1(0);
-        d1[1] = pi_proj[1] - p1(1);
-        d1[2] = pi_proj[2] - p1(2);
+        T d1[3], d2[3], d12[3];
+        d1[0] = pi_proj[0] - T(p1(0));
+        d1[1] = pi_proj[1] - T(p1(1));
+        d1[2] = pi_proj[2] - T(p1(2));
 
-        d2[0] = pi_proj[0] - p2(0);
-        d2[1] = pi_proj[1] - p2(1);
-        d2[2] = pi_proj[2] - p2(2);
+        d2[0] = pi_proj[0] - T(p2(0));
+        d2[1] = pi_proj[1] - T(p2(1));
+        d2[2] = pi_proj[2] - T(p2(2));
 
-        d12[0] = p1(0) - p2(0);
-        d12[1] = p1(1) - p2(1);
-        d12[2] = p1(2) - p2(2);
+        d12[0] = p1(0) - T(p2(0));
+        d12[1] = p1(1) - T(p2(1));
+        d12[2] = p1(2) - T(p2(2));
 
         T cross[3];
         CrossProduct(d1, d2, cross);

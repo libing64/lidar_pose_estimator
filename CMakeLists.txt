@@ -176,6 +176,9 @@ add_executable(lidar_pose_estimator_example  src/lidar_pose_estimator_example.cp
 target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 
+add_executable(lidar_pose_graph_example  src/lidar_pose_graph_example.cpp)
+target_link_libraries(lidar_pose_graph_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+
 #############
 ## Install ##
 #############
