@@ -129,7 +129,7 @@ void lidar_pose_estimator::transform_update()
     Eigen::Quaterniond dq_inv = dq.inverse();
     Eigen::Vector3d dt_inv = -dq_inv.toRotationMatrix() * dt;
 
-    t += q.toRotationMatrix() * dt;
+    t += q.toRotationMatrix() * dt_inv;
     q *= dq_inv;
 }
 

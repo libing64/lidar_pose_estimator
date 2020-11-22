@@ -60,9 +60,9 @@ void publish_pose(lidar_pose_estimator &est)
     pose.pose.orientation.x = q.x();
     pose.pose.orientation.y = q.y();
     pose.pose.orientation.z = q.z();
-    pose.pose.position.x = -p(0);
-    pose.pose.position.y = -p(1);
-    pose.pose.position.z = -p(2);
+    pose.pose.position.x = p(0);
+    pose.pose.position.y = p(1);
+    pose.pose.position.z = p(2);
     pub_pose.publish(pose);
 
     //cout << "publish pose: " << endl;
