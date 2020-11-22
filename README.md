@@ -173,3 +173,4 @@ direction of x y z: right-forward-up
 * cauchy loss 对精度提升很明显， 但是姿态漂移太快了
 * 貌似求解的防线和groundtruth是反的
 * 姿态漂移比较厉害，需要planar point的约束才行？
+* planar约束对姿态约束比较明显，大大的改善了漂移问题
