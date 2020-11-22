@@ -139,7 +139,6 @@ void lidar_preprocessor::remove_invalid_data()
     {
         lidar_cloud.points.resize(j);
     }
-    //this->visualize_cloud();
     cout << "lidar_cloud size: " << lidar_cloud.points.size() << endl;
     lidar_cloud.height = 1;
     lidar_cloud.width = j;
@@ -148,31 +147,12 @@ void lidar_preprocessor::remove_invalid_data()
 
 void lidar_preprocessor::get_horizon_angle_range()
 {
-    //this->visualize_cloud();
     PointType p = lidar_cloud.points.front();
     this->min_angle_hori = atan2(p.y, p.x);
 
     p = lidar_cloud.points.back();
     this->max_angle_hori = atan2(p.y, p.x);
     cout << "horizon angle range: " << min_angle_hori << "  " << max_angle_hori << endl;
-
-    // printf("horizon angle\n");
-    // for (auto i = 0; i < lidar_cloud.points.size(); i++)
-    // {
-    //     PointType p = lidar_cloud.points[i];
-    //     float angle = atan2(p.y, p.x);
-    //     printf("%f,", angle);
-    // }
-
-    // printf("\nvertical angle\n");
-    // for (auto i = 0; i < lidar_cloud.points.size(); i++)
-    // {
-    //     PointType p = lidar_cloud.points[i];
-    //     float dist_hori = sqrtf(p.x * p.x + p.y * p.y);
-    //     float angle = atan2(p.z, dist_hori);
-    //     printf("%f,", angle);
-    // }
-    //this->visualize_cloud();
 }
 
 void lidar_preprocessor::visualize_cloud()
@@ -255,10 +235,18 @@ void lidar_preprocessor::get_feature_points()
         std::sort(lidar_cloud.points.begin() + left, lidar_cloud.points.begin() + right, comp);
         PointType edge = *(lidar_cloud.points.begin() + right);
         PointType planar = *(lidar_cloud.points.begin() + left);
-        if (edge.intensity > edge_point_thresh && planar.intensity < planar_point_thresh)
+        PointType planar2 = *(lidar_cloud.points.begin() + left + 1);
+        if (edge.intensity > edge_point_thresh )
         {
             edge_points.push_back(edge);
+        }
+        if (planar.intensity < planar_point_thresh)
+        {
             planar_points.push_back(planar);
+        }
+        if (planar2.intensity < planar_point_thresh)
+        {
+            planar_points.push_back(planar2);
         }
     }
 
