@@ -103,3 +103,7 @@ result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
 direction of x y z: right-forward-up
 
 ## how to make the system more robust?
+
+* cauchy loss 对精度提升很明显， 但是姿态漂移太快了
+* 貌似求解的防线和groundtruth是反的
+* 姿态漂移比较厉害，需要planar point的约束才行？

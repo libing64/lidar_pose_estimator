@@ -31,6 +31,7 @@ public:
     const int splite_cnt = channel * 5;
     const float edge_point_thresh = 0.2;
     const float planar_point_thresh = 0.05;
+    const float min_dist_thresh = 0.5;//min distance for selecting features
     float min_angle_hori;
     float max_angle_hori;
     bool vis_enable = false;
@@ -235,14 +236,10 @@ void lidar_preprocessor::get_cloud_curvature()
         lidar_cloud.points[i].intensity = curvature[i]; //curvature visualization
     }
     for (int i = 0; i < HALF_CURVA_LEN; i++)
-        curvature[i] = 0;
+        curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++)
-        curvature[i] = 0;
+        curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
 
-    // for (int i = 0; i < curvature.size(); i++)
-    // {
-    //     printf("%f,", curvature[i]);
-    // }
     visualize_cloud();
 }
 
@@ -262,10 +259,6 @@ void lidar_preprocessor::get_feature_points()
         {
             edge_points.push_back(edge);
             planar_points.push_back(planar);
-        }
-        else
-        {
-            //printf("edge curv: %f, planer curv: %f\n", edge.intensity, planar.intensity);
         }
     }
 
