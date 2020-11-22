@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(LIOM)
+project(lidar_pose_estimator)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -130,7 +130,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  src
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
@@ -170,14 +170,13 @@ include_directories(
 # target_link_libraries(kitti_loader ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 
-add_executable(lidar_pose_estimator_example  src/lidar_pose_estimator_example.cpp)
+add_executable(lidar_pose_estimator_example  utest/lidar_pose_estimator_example.cpp)
 target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
-
-add_executable(kdtree_example  src/kdtree_example.cpp)
+add_executable(kdtree_example  utest/kdtree_example.cpp)
 target_link_libraries(kdtree_example ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-add_executable(lidar_pose_graph_example  src/lidar_pose_graph_example.cpp)
+add_executable(lidar_pose_graph_example  utest/lidar_pose_graph_example.cpp)
 target_link_libraries(lidar_pose_graph_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 add_executable(lidar_pose_estimator_node  src/lidar_pose_estimator_node.cpp)
