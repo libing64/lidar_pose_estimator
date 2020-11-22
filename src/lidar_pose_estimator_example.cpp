@@ -1,3 +1,4 @@
+#include "lidar_preprocessor.h"
 #include "lidar_pose_estimator.h"
 #include <iostream>
 #include <Eigen/Eigen>
