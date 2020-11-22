@@ -49,17 +49,19 @@ void lidar_pose_estimator::transform_update()
     std::cout << "edge point size prev: " << lidar_prev.lidar_cloud.points.size() << std::endl;
     std::cout << "edge point size: " << lidar.lidar_cloud.points.size() << std::endl;
 
-    pcl::KdTreeFLANN<PointType> kdtree;
-    kdtree.setInputCloud(lidar.edge_points.makeShared());
-    // K nearest neighbor search
-    int K = 2;
-    std::vector<int> index(K);
-    std::vector<float> distance(K);
+
 
     //ceres optimization
     double pose[6] = {0, 0, 0, 0, 0, 0}; //0-2 for roation and 3-5 for tranlation
     Problem problem;
 
+    pcl::KdTreeFLANN<PointType> kdtree;
+    kdtree.setInputCloud(lidar.edge_points.makeShared());
+    int K = 2; // K nearest neighbor search
+    std::vector<int> index(K);
+    std::vector<float> distance(K);
+
+    //add constraint for edge points
     for (int i = 0; i < lidar_prev.edge_points.points.size(); i++)
     {
         PointType search_point = lidar_prev.edge_points.points[i];
@@ -75,6 +77,29 @@ void lidar_pose_estimator::transform_update()
                                      pose);
         }
     }
+
+    //add constraints for planar points
+    K = 3;
+    kdtree.setInputCloud(lidar.planar_points.makeShared());
+    index.resize(K);
+    distance.resize(K);
+    for (int i = 0; i < lidar_prev.planar_points.points.size(); i++)
+    {
+        PointType search_point = lidar_prev.planar_points.points[i];
+        if (kdtree.nearestKSearch(search_point, K, index, distance) == K)
+        {
+            //add constraints
+            Eigen::Vector3d p = point2eigen(search_point);
+            Eigen::Vector3d p1 = point2eigen(lidar.planar_points.points[index[0]]);
+            Eigen::Vector3d p2 = point2eigen(lidar.planar_points.points[index[1]]);
+            Eigen::Vector3d p3 = point2eigen(lidar.planar_points.points[index[2]]);
+            ceres::CostFunction *cost_function = lidar_planar_error::Create(p, p1, p2, p3);
+            problem.AddResidualBlock(cost_function,
+                                     new CauchyLoss(0.5),
+                                     pose);
+        }
+    }
+
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_SCHUR;
     options.minimizer_progress_to_stdout = true;

@@ -35,7 +35,7 @@ cloud_Ptr=cloud.makeShared;
 直接进行分组是不是也是可以的?
 
 
-## lidar_pose_graph 
+## edge_pose_graph 
 ```
 groundtruth: 
 angle_axis: -1.69742 0.717996 -1.12579
@@ -90,6 +90,72 @@ Total                                0.000475
 Termination:                      CONVERGENCE (Parameter tolerance reached. Relative step_norm: 2.934019e-12 <= 1.000000e-08.)
 
 result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
+
+```
+
+## planar pose graph
+```
+groundtruth: 
+angle_axis: -1.69742 0.717996 -1.12579
+trans:    0.747958 -0.00371215    0.152399
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  2.414344e+05    0.00e+00    2.18e+04   0.00e+00   0.00e+00  1.00e+04        0    3.38e-05    8.86e-05
+   1  2.307385e+05    1.07e+04    1.62e+04   2.22e+01   1.12e+00  3.00e+04        0    1.18e-04    2.17e-04
+   2  2.283459e+05    2.39e+03    1.77e+04   9.11e-01   2.03e+00  9.00e+04        0    9.72e-05    3.22e-04
+   3  2.257612e+05    2.58e+03    1.98e+04   9.57e-01   2.05e+00  2.70e+05        0    8.50e-05    4.13e-04
+   4  2.228015e+05    2.96e+03    2.28e+04   1.16e+00   2.09e+00  8.10e+05        0    7.04e-05    4.90e-04
+   5  2.189365e+05    3.86e+03    2.72e+04   1.56e+00   2.20e+00  2.43e+06        0    7.07e-05    5.67e-04
+   6  2.123916e+05    6.54e+03    3.35e+04   2.25e+00   2.41e+00  7.29e+06        0    7.06e-05    6.44e-04
+   7  1.948018e+05    1.76e+04    6.06e+04   3.50e+00   2.81e+00  2.19e+07        0    7.06e-05    7.20e-04
+   8  1.114366e+05    8.34e+04    1.31e+05   6.34e+00   3.13e+00  6.56e+07        0    6.98e-05    7.96e-04
+   9  6.941095e+03    1.04e+05    5.16e+04   8.97e+00   1.21e+00  1.97e+08        0    7.15e-05    8.74e-04
+  10  1.681306e+00    6.94e+03    4.49e+02   3.14e+00   1.00e+00  5.90e+08        0    8.11e-05    9.61e-04
+  11  1.864407e-07    1.68e+00    2.43e-01   2.39e-01   1.00e+00  1.77e+09        0    8.43e-05    1.05e-03
+  12  2.179418e-21    1.86e-07    1.83e-08   3.08e-05   1.00e+00  5.31e+09        0    6.97e-05    1.13e-03
+
+Solver Summary (v 1.14.0-eigen-(3.3.7)-lapack-suitesparse-(5.7.1)-cxsparse-(3.2.0)-eigensparse-openmp-no_tbb)
+
+                                     Original                  Reduced
+Parameter blocks                            1                        1
+Parameters                                  6                        6
+Residual blocks                           100                      100
+Residuals                                 100                      100
+
+Minimizer                        TRUST_REGION
+
+Dense linear algebra library            EIGEN
+Trust region strategy     LEVENBERG_MARQUARDT
+
+                                        Given                     Used
+Linear solver                     DENSE_SCHUR              DENSE_SCHUR
+Threads                                     1                        1
+Linear solver ordering              AUTOMATIC                        1
+Schur structure                         1,6,0                    d,d,d
+
+Cost:
+Initial                          2.414344e+05
+Final                            2.179418e-21
+Change                           2.414344e+05
+
+Minimizer iterations                       13
+Successful steps                           13
+Unsuccessful steps                          0
+
+Time (in seconds):
+Preprocessor                         0.000055
+
+  Residual only evaluation           0.000122 (13)
+  Jacobian & residual evaluation     0.000332 (13)
+  Linear solver                      0.000477 (13)
+Minimizer                            0.001123
+
+Postprocessor                        0.000002
+Total                                0.001180
+
+Termination:                      CONVERGENCE (Parameter tolerance reached. Relative step_norm: 2.689042e-12 <= 1.000000e-08.)
+
+result: -1.697416, 0.717996, -1.125791, 0.747958, -0.003712, 0.152399
+
 
 ```
 
