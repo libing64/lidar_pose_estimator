@@ -22,6 +22,10 @@ public:
     lidar_preprocessor lidar;
     lidar_preprocessor lidar_prev;
 
+    //feature map in current frame
+    pcl::PointCloud<PointType> edge_point_map;
+    pcl::PointCloud<PointType> planar_point_map;
+
     //transform from lidar_prov to lidar
     Eigen::Quaterniond q;
     Eigen::Vector3d t;
@@ -31,6 +35,7 @@ public:
     ~lidar_pose_estimator();
 
     void update(const sensor_msgs::PointCloud2ConstPtr &msg);
+    void update_feature_map();
     void transform_update();
 };
 
@@ -100,13 +105,13 @@ void lidar_pose_estimator::transform_update()
 
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_SCHUR;
-    options.minimizer_progress_to_stdout = true;
+    options.minimizer_progress_to_stdout = false;
 
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
-    std::cout << summary.FullReport() << "\n";
+    //std::cout << summary.FullReport() << "\n";
 
-    printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
+    //printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
 
     Eigen::Quaterniond dq;
     Eigen::Vector3d dt;
@@ -128,8 +133,15 @@ void lidar_pose_estimator::transform_update()
     q *= dq_inv;
 }
 
+void lidar_pose_estimator::update_feature_map()
+{
+    //project features to current frame
+}
+
 void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
 {
+    clock_t start = clock();
+
     timestamp = msg->header.stamp.toSec();
     if (lidar.lidar_cloud.points.size())
     {
@@ -149,6 +161,9 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
     {
         transform_update();
     } 
+
+    double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
+    printf("lidar update cost %lfs", dt);
 }
 
 #endif

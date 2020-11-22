@@ -174,3 +174,41 @@ direction of x y z: right-forward-up
 * 貌似求解的防线和groundtruth是反的
 * 姿态漂移比较厉害，需要planar point的约束才行？
 * planar约束对姿态约束比较明显，大大的改善了漂移问题
+* 如果要降低drift, feature map是不可少的
+
+## feature map
+project history features to current frame, 然后remove outliers
+
+* record correspondence and projection
+* remove mismatch and add that point to feature map
+
+## record screen
+byzanz
+```
+byzanz-record --help
+Usage:
+  byzanz-record [OPTION...] record your current desktop session
+
+Help Options:
+  -?, --help               Show help options
+  --help-all               Show all help options
+  --help-gtk               Show GTK+ Options
+
+Application Options:
+  -d, --duration=SECS      Duration of animation (default: 10 seconds)
+  -e, --exec=COMMAND       Command to execute and time
+  --delay=SECS             Delay before start (default: 1 second)
+  -c, --cursor             Record mouse cursor
+  -a, --audio              Record audio
+  -x, --x=PIXEL            X coordinate of rectangle to record
+  -y, --y=PIXEL            Y coordinate of rectangle to record
+  -w, --width=PIXEL        Width of recording rectangle
+  -h, --height=PIXEL       Height of recording rectangle
+  -v, --verbose            Be verbose
+  --display=DISPLAY        X display to use
+```
+
+example 
+```
+byzanz-record --delay 10 -d 30
+```
