@@ -166,10 +166,13 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-# add_executable(kitti_loader  src/kitti_loader.cpp)
-# target_link_libraries(kitti_loader ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+add_executable(kitti_loader  src/kitti_loader.cpp)
+target_link_libraries(kitti_loader ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
+add_executable(lidar_pose_estimator_node  src/lidar_pose_estimator_node.cpp)
+target_link_libraries(lidar_pose_estimator_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
+# utest examples
 add_executable(lidar_pose_estimator_example  utest/lidar_pose_estimator_example.cpp)
 target_link_libraries(lidar_pose_estimator_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
@@ -178,9 +181,6 @@ target_link_libraries(kdtree_example ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(lidar_pose_graph_example  utest/lidar_pose_graph_example.cpp)
 target_link_libraries(lidar_pose_graph_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
-
-add_executable(lidar_pose_estimator_node  src/lidar_pose_estimator_node.cpp)
-target_link_libraries(lidar_pose_estimator_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 
 #############

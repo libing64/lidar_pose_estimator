@@ -25,6 +25,10 @@ soure devel/setup.bash
 roslaunch lidar_pose_estimator lidar_pose_estimator.launch
 ```
 
+## 1.4 rqt_graph
+![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/ros_graph.gif) 
+
+
 # 2. Problems
 
 ## 2.1 Conversion between PointCloud and Ptr 
@@ -190,18 +194,13 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 
 # 3. TODO
 
-## lidar pose estimator with edge point only
-
-
-## velodyne coordinate
-
-
-## how to make the system more robust?
+## 3.1 How to make the estimator more robust and accurate?
 - [x] cauchy loss for ceres optimization
 - [ ] position result is negative of groundtruth
 - [x] drfit fast if noly edge point for constraints, add planar points for constraints
 - [ ] reduce drift, add feature maps
 - [ ] scale not accurate
+- [ ] test with more dataset
 - [x] record screen to gif
 
 

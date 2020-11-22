@@ -1,7 +1,7 @@
 <launch>
     
 
-    <node name="kitti_loader" pkg="LIOM" type="kitti_loader" output="screen"> 
+    <node name="kitti_loader" pkg="lidar_pose_estimator" type="kitti_loader" output="screen"> 
         <param name="dataset_folder" type="string" value="/home/libing/data/kitty_raw/" />
         <param name="sequence_number" type="string" value="05" />
         <param name="to_bag" type="bool" value="false" />
@@ -10,6 +10,6 @@
         <param name="publish_delay" type="int" value="1" />
     </node>
 
-    <node pkg="LIOM" type="lidar_pose_estimator_node" name="lidar_pose_estimator_node" output="screen" />
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find LIOM)/rviz_cfg/kitty_velodyne.rviz"/>
+    <node pkg="lidar_pose_estimator" type="lidar_pose_estimator_node" name="lidar_pose_estimator_node" output="screen" />
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lidar_pose_estimator)/rviz_cfg/kitty_velodyne.rviz"/>
 </launch>
