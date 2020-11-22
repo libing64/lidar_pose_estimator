@@ -14,65 +14,32 @@ using namespace std;
 using namespace Eigen;
 
 
-std::vector<float> read_lidar_data(const std::string filename)
-{
-    std::ifstream lidar_data_file(filename, std::ifstream::in | std::ifstream::binary);
-    lidar_data_file.seekg(0, std::ios::end);
-    const size_t num_elements = lidar_data_file.tellg() / sizeof(float);
-    lidar_data_file.seekg(0, std::ios::beg);
-
-    std::vector<float> lidar_data_buffer(num_elements);
-    lidar_data_file.read(reinterpret_cast<char *>(&lidar_data_buffer[0]), num_elements * sizeof(float));
-    return lidar_data_buffer;
-}
-
 int main(int argc, char** argv)
 {
+    char filename_prev[1024] = {0};
     char filename[1024] = {0};
-    if (argc < 2)
+    if (argc < 3)
     {
-        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000005.bin");
+        strcpy(filename_prev, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000100.bin");
+        strcpy(filename, "/home/libing/data/kitty_raw/data_odometry_velodyne/dataset/sequences/01/velodyne/000120.bin");
     } else 
     {
-        strcpy(filename, argv[1]);
+        strcpy(filename_prev, argv[1]);
+        strcpy(filename, argv[2]);
     }
-    cout << "filename: " << filename << endl;
-    vector<float> lidar_data = read_lidar_data(filename);
-    cout << "lidar data size: " << lidar_data.size() << endl;
+    cout << "filename: " << filename_prev << endl << filename << endl;
 
-    pcl::PointCloud<PointType> lidar_cloud;
-    for (int i = 0; i < lidar_data.size(); i += 4)
-    {
-        PointType p;
-        p.x = lidar_data[i];
-        p.y = lidar_data[i+1];
-        p.z = lidar_data[i+2];
-        p.intensity = lidar_data[i+3];
-        lidar_cloud.push_back(p);
+    lidar_pose_estimator estimator;
+    estimator.lidar_prev.process(filename_prev);
+    estimator.lidar.process(filename);
 
-        if (isnan(p.x) || isnan(p.y) || isnan(p.z) || isnan(p.intensity))
-        {
-            cout << "nan: " << i << endl;
-        }
-    }
-    lidar_cloud.height = 1;
-    lidar_cloud.width = lidar_cloud.points.size();
-    lidar_cloud.is_dense = true;
-    cout << "lidar cloud size: " << lidar_cloud.points.size() << endl;
-    // pcl::visualization::CloudViewer viewer("lidar_cloud");
-
-    // pcl::PointCloud<PointType>::Ptr lidar_cloud_ptr(new pcl::PointCloud<PointType>);
-    // lidar_cloud_ptr = lidar_cloud.makeShared();
-    // viewer.showCloud(lidar_cloud_ptr);
-    // while(!viewer.wasStopped()){}
-
-    lidar_preprocessor lidar;
-    lidar.readin_lidar_cloud(lidar_cloud);
-    lidar.inject_invalid_data();//TODO remove
-    lidar.remove_invalid_data();
-    lidar.get_horizon_angle_range();
-    lidar.get_cloud_curvature();
-    lidar.get_feature_points();
+    // lidar_preprocessor lidar;
+    // lidar.readin_lidar_cloud(lidar_cloud);
+    // lidar.inject_invalid_data();//TODO remove
+    // lidar.remove_invalid_data();
+    // lidar.get_horizon_angle_range();
+    // lidar.get_cloud_curvature();
+    // lidar.get_feature_points();
 
     return 0;
 }

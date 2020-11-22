@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include <Eigen/Eigen>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -15,6 +16,7 @@
 using std::cout;
 using std::endl;
 using std::vector;
+using std::string;
 
 typedef pcl::PointXYZI PointType;
 bool comp(PointType pi, PointType pj) { return (pi.intensity < pj.intensity); }
@@ -41,6 +43,7 @@ public:
     lidar_preprocessor(/* args */);
     ~lidar_preprocessor();
 
+    void readin_lidar_cloud(string filename);
     void readin_lidar_cloud(pcl::PointCloud<PointType> &cloud); //{lidar_cloud = cloud;}
     void inject_invalid_data();
     void remove_invalid_data();
@@ -51,6 +54,7 @@ public:
     float distance(PointType pi, PointType pj);
     float distance(PointType p);
     void get_feature_points();
+    void process(string filename);
 };
 
 lidar_preprocessor::lidar_preprocessor(/* args */)
@@ -77,6 +81,29 @@ void lidar_preprocessor::inject_invalid_data()
     }
 }
 
+void lidar_preprocessor::readin_lidar_cloud(string filename)
+{
+    std::ifstream lidar_data_file(filename, std::ifstream::in | std::ifstream::binary);
+    lidar_data_file.seekg(0, std::ios::end);
+    const size_t num_elements = lidar_data_file.tellg() / sizeof(float);
+    lidar_data_file.seekg(0, std::ios::beg);
+
+    std::vector<float> lidar_data(num_elements);
+    lidar_data_file.read(reinterpret_cast<char *>(&lidar_data[0]), num_elements * sizeof(float));
+
+    for (int i = 0; i < lidar_data.size(); i += 4)
+    {
+        PointType p;
+        p.x = lidar_data[i];
+        p.y = lidar_data[i + 1];
+        p.z = lidar_data[i + 2];
+        p.intensity = lidar_data[i + 3];
+        lidar_cloud.push_back(p);
+    }
+    lidar_cloud.height = 1;
+    lidar_cloud.width = lidar_cloud.points.size();
+    lidar_cloud.is_dense = true;
+}
 void lidar_preprocessor::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
 {
     //lidar_cloud = cloud;
@@ -244,4 +271,14 @@ void lidar_preprocessor::get_feature_points()
     visualize_cloud_data(edge_points.makeShared(), "edge");
     visualize_cloud_data(planar_points.makeShared(), "planar");
 }
+void lidar_preprocessor::process(string filename)
+{
+    readin_lidar_cloud(filename);
+    inject_invalid_data(); //TODO remove
+    remove_invalid_data();
+    get_horizon_angle_range();
+    get_cloud_curvature();
+    get_feature_points();
+}
+
 #endif

@@ -9,6 +9,9 @@ class lidar_pose_estimator
 private:
     /* data */
 public:
+    lidar_preprocessor lidar;
+    lidar_preprocessor lidar_prev;
+
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
 };

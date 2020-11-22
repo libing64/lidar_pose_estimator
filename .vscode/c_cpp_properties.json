@@ -9,8 +9,7 @@
                 "/opt/ros/noetic",
                 "/usr/include/pcl-1.10",
                 "src",
-                "/usr/include/ceres",
-                "/usr/include"
+                "/usr/include/ceres"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
