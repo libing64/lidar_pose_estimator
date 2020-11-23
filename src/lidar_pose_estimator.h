@@ -105,7 +105,8 @@ void lidar_pose_estimator::transform_update()
     for (int i = 0; i < lidar_prev.planar_points.points.size(); i++)
     {
         PointType search_point = lidar_prev.planar_points.points[i];
-        if (kdtree.nearestKSearch(search_point, K, index, distance) == K)
+        PointType search_point_predict = eigen2point(R * point2eigen(search_point) + dt);
+        if (kdtree.nearestKSearch(search_point_predict, K, index, distance) == K)
         {
             //add constraints
             Eigen::Vector3d p = point2eigen(search_point);
