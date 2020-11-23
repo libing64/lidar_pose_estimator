@@ -9,6 +9,9 @@
 * publish result
 * mapping
 
+![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/lidar_pose_estimator.png) 
+
+
 ![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/lidar_pose_estimator.gif) 
 
 ## 1.2 Building
@@ -202,7 +205,7 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 - [x] position result is negative of groundtruth
 - [x] drfit fast if noly edge point for constraints, add planar points for constraints
 - [ ] reduce drift, add feature maps
-- [ ] scale not accurate
+- [x] scale not accurate
 - [ ] test with more dataset
 - [ ] loop closure
 - [x] predictor before find correspondance
