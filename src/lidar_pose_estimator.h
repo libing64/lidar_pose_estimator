@@ -14,6 +14,15 @@ Eigen::Vector3d point2eigen(PointType p)
     return pp;
 }
 
+PointType eigen2point(Eigen::Vector3d pp)
+{
+    PointType p;
+    p.x = pp(0);
+    p.y = pp(1);
+    p.z = pp(2);
+    return p;
+}
+
 class lidar_pose_estimator
 {
 private:
@@ -26,10 +35,14 @@ public:
     pcl::PointCloud<PointType> edge_point_map;
     pcl::PointCloud<PointType> planar_point_map;
 
-    //transform from lidar_prov to lidar
+    //transform  from current frame to init frame
     Eigen::Quaterniond q;
     Eigen::Vector3d t;
     double timestamp;
+
+    //transform from lidar_prov to lidar
+    Eigen::Quaterniond dq;
+    Eigen::Vector3d dt;
 
     lidar_pose_estimator(/* args */);
     ~lidar_pose_estimator();
@@ -64,11 +77,14 @@ void lidar_pose_estimator::transform_update()
     std::vector<int> index(K);
     std::vector<float> distance(K);
 
+    Eigen::Matrix3d R = dq.toRotationMatrix();
     //add constraint for edge points
     for (int i = 0; i < lidar_prev.edge_points.points.size(); i++)
     {
         PointType search_point = lidar_prev.edge_points.points[i];
-        if (kdtree.nearestKSearch(search_point, K, index, distance) == K)
+        //project search_point to current frame
+        PointType search_point_predict = eigen2point(R * point2eigen(search_point) + dt);
+        if (kdtree.nearestKSearch(search_point_predict, K, index, distance) == K)
         {
             //add constraints
             Eigen::Vector3d p = point2eigen(search_point);
@@ -112,9 +128,6 @@ void lidar_pose_estimator::transform_update()
     //std::cout << summary.FullReport() << "\n";
 
     //printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
-
-    Eigen::Quaterniond dq;
-    Eigen::Vector3d dt;
 
     double qq[4];
     ceres::AngleAxisToQuaternion(pose, qq);
