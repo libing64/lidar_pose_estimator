@@ -199,11 +199,12 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 
 ## 3.1 How to make the estimator more robust and accurate?
 - [x] cauchy loss for ceres optimization
-- [ ] position result is negative of groundtruth
+- [x] position result is negative of groundtruth
 - [x] drfit fast if noly edge point for constraints, add planar points for constraints
 - [ ] reduce drift, add feature maps
 - [ ] scale not accurate
 - [ ] test with more dataset
+- [ ] loop closure
 - [x] record screen to gif
 
 
