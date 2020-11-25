@@ -28,10 +28,10 @@ public:
     int channel = 64;
     const float min_range = 0.1;
     const int HALF_CURVA_LEN = 4;
-    const int splite_cnt = channel * 5;
-    const float edge_point_thresh = 0.2;
+    const int splite_cnt = channel * 10;
+    const float edge_point_thresh = 0.1;
     const float planar_point_thresh = 0.05;
-    const float min_dist_thresh = 0.2;//min distance for selecting features
+    const float min_dist_thresh = 0.1;//min distance for selecting features
     bool vis_enable = false;
 
     vector<float> curvature;

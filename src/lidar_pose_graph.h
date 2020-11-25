@@ -63,7 +63,8 @@ struct lidar_edge_error
 
         T norm = sqrt(cross[0] * cross[0] + cross[1] * cross[1] + cross[2] * cross[2]);
         T norm12 = sqrt(d12[0] * d12[0] + d12[1] * d12[1] + d12[2] * d12[2]);
-        residuals[0] = norm / norm12;
+        T weight = T(10.0);
+        residuals[0] = weight * norm / norm12;
         return true;
     }
 

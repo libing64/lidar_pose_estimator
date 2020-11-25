@@ -50,12 +50,15 @@ public:
     void update(const sensor_msgs::PointCloud2ConstPtr &msg);
     void update_feature_map();
     void transform_update();
+    void transform_accumulate();
 };
 
 lidar_pose_estimator::lidar_pose_estimator(/* args */)
 {
     q = Eigen::Quaterniond::Identity();
     t = Eigen::Vector3d::Zero();
+    dq = Eigen::Quaterniond::Identity();
+    dt = Eigen::Vector3d::Zero();
 }
 
 lidar_pose_estimator::~lidar_pose_estimator()
@@ -70,6 +73,18 @@ void lidar_pose_estimator::transform_update()
     //ceres optimization
     double pose[6] = {0, 0, 0, 0, 0, 0}; //0-2 for roation and 3-5 for tranlation
     Problem problem;
+
+    //init paramameter
+    double q0[4];
+    q0[0] = dq.w();
+    q0[1] = dq.x();
+    q0[2] = dq.y();
+    q0[3] = dq.z();
+    ceres::QuaternionToAngleAxis(q0, pose);
+    pose[3] = dt(0);
+    pose[4] = dt(1);
+    pose[5] = dt[2];
+
 
     pcl::KdTreeFLANN<PointType> kdtree;
     kdtree.setInputCloud(lidar.edge_points.makeShared());
@@ -138,7 +153,10 @@ void lidar_pose_estimator::transform_update()
     dq.x() = qq[1];
     dq.y() = qq[2];
     dq.z() = qq[3];
+}
 
+void lidar_pose_estimator::transform_accumulate()
+{
     //update transformation
     Eigen::Quaterniond dq_inv = dq.inverse();
     Eigen::Vector3d dt_inv = -dq_inv.toRotationMatrix() * dt;
@@ -174,6 +192,9 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
     if (lidar_prev.lidar_cloud.points.size() && lidar.lidar_cloud.points.size())
     {
         transform_update();
+        transform_update();
+        transform_update();
+        transform_accumulate();
     } 
 
     double dt = ((double)clock() - start) / CLOCKS_PER_SEC;

@@ -209,7 +209,10 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 - [ ] test with more dataset
 - [ ] loop closure
 - [x] predictor before find correspondance
+- [ ] iteration for finding correspondence
 - [ ] trajectory evaluation
+- [ ] drift faster when rotating -- increase weight for edge contraints
+- [ ] select loss function
 - [x] record screen to gif
 
 
