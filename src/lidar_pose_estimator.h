@@ -178,10 +178,6 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
     if (lidar.lidar_cloud.points.size())
     {
         //copy current lidar data for prev 
-        lidar_prev.lidar_cloud.clear();
-        lidar_prev.edge_points.clear();
-        lidar_prev.planar_points.clear();
-
         lidar_prev.lidar_cloud = lidar.lidar_cloud;
         lidar_prev.edge_points = lidar.edge_points;
         lidar_prev.planar_points = lidar.planar_points;
@@ -190,7 +186,6 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
 
     if (lidar_prev.lidar_cloud.points.size() && lidar.lidar_cloud.points.size())
     {
-        transform_update();
         transform_update();
         transform_update();
         transform_accumulate();

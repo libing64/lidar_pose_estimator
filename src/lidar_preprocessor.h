@@ -29,8 +29,8 @@ public:
     const float min_range = 0.1;
     const int HALF_CURVA_LEN = 4;
     const int splite_cnt = channel * 10;
-    const float edge_point_thresh = 0.08;
-    const float planar_point_thresh = 0.05;
+    const float edge_point_thresh = 0.1;
+    const float planar_point_thresh = 0.01;
     const float min_dist_thresh = 0.1;//min distance for selecting features
     bool vis_enable = false;
 
@@ -39,17 +39,15 @@ public:
     pcl::PointCloud<PointType> edge_points;
     pcl::PointCloud<PointType> planar_points;
 
-    lidar_preprocessor(/* args */);
+    lidar_preprocessor();
     ~lidar_preprocessor();
 
     void set_cloud_vis(bool vis){vis_enable = vis;}
     void readin_lidar_cloud(string filename);
-    void readin_lidar_cloud(pcl::PointCloud<PointType> &cloud); //{lidar_cloud = cloud;}
     void remove_invalid_data();
 
     void visualize_cloud(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
     void get_cloud_curvature();
-    float distance(PointType pi, PointType pj);
     float distance(PointType p);
     void get_feature_points();
     void remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index);
@@ -58,7 +56,7 @@ public:
     void process(const sensor_msgs::PointCloud2ConstPtr &msg);
 };
 
-lidar_preprocessor::lidar_preprocessor(/* args */)
+lidar_preprocessor::lidar_preprocessor()
 {
 }
 
@@ -89,10 +87,7 @@ void lidar_preprocessor::readin_lidar_cloud(string filename)
     lidar_cloud.width = lidar_cloud.points.size();
     lidar_cloud.is_dense = true;
 }
-void lidar_preprocessor::readin_lidar_cloud(pcl::PointCloud<PointType> &cloud)
-{
-    pcl::copyPointCloud(cloud, lidar_cloud);
-}
+
 void lidar_preprocessor::remove_invalid_data()
 {
     vector<int> valid_index(lidar_cloud.points.size());
@@ -133,15 +128,6 @@ void lidar_preprocessor::visualize_cloud(pcl::PointCloud<PointType>::Ptr ptr, st
         {
         }
     }
-}
-
-float lidar_preprocessor::distance(PointType pi, PointType pj)
-{
-    float dx = pi.x - pj.x;
-    float dy = pi.y - pj.y;
-    float dz = pi.z - pj.z;
-    float dist = sqrtf(dx * dx + dy * dy + dz * dz);
-    return dist;
 }
 
 float lidar_preprocessor::distance(PointType p)
