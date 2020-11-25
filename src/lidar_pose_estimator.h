@@ -186,8 +186,7 @@ void lidar_pose_estimator::update(const sensor_msgs::PointCloud2ConstPtr &msg)
         lidar_prev.edge_points = lidar.edge_points;
         lidar_prev.planar_points = lidar.planar_points;
     }
-    pcl::fromROSMsg(*msg, lidar.lidar_cloud);
-    lidar.process();
+    lidar.process(msg);
 
     if (lidar_prev.lidar_cloud.points.size() && lidar.lidar_cloud.points.size())
     {

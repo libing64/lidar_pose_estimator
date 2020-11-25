@@ -29,7 +29,7 @@ public:
     const float min_range = 0.1;
     const int HALF_CURVA_LEN = 4;
     const int splite_cnt = channel * 10;
-    const float edge_point_thresh = 0.1;
+    const float edge_point_thresh = 0.08;
     const float planar_point_thresh = 0.05;
     const float min_dist_thresh = 0.1;//min distance for selecting features
     bool vis_enable = false;
@@ -55,7 +55,7 @@ public:
     void remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index);
     void remove_neighbor_feature(pcl::PointCloud<PointType> &cloud);
     void process(string filename);
-    void process();
+    void process(const sensor_msgs::PointCloud2ConstPtr &msg);
 };
 
 lidar_preprocessor::lidar_preprocessor(/* args */)
@@ -170,9 +170,16 @@ void lidar_preprocessor::get_cloud_curvature()
         lidar_cloud.points[i].intensity = curvature[i]; //curvature visualization
     }
     for (int i = 0; i < HALF_CURVA_LEN; i++)
+    {
         curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
+        lidar_cloud.points[i].intensity = curvature[i];
+    }
+
     for (int i = lidar_cloud.points.size() - HALF_CURVA_LEN; i < lidar_cloud.points.size(); i++)
+    {
         curvature[i] = (edge_point_thresh + planar_point_thresh) / 2;
+        lidar_cloud.points[i].intensity = curvature[i];
+    }
 }
 
 void lidar_preprocessor::get_feature_points()
@@ -275,8 +282,9 @@ void lidar_preprocessor::process(string filename)
     remove_neighbor_feature(planar_points);
 }
 
-void lidar_preprocessor::process()
+void lidar_preprocessor::process(const sensor_msgs::PointCloud2ConstPtr &msg)
 {
+    pcl::fromROSMsg(*msg, lidar_cloud);
     remove_invalid_data();
     get_cloud_curvature();
     get_feature_points();
