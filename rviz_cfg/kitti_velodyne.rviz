@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Grid1
         - /PointCloud21
         - /Path2
       Splitter Ratio: 0.5852941274642944
@@ -37,7 +38,7 @@ Visualization Manager:
   Class: ""
   Displays:
     - Alpha: 0.5
-      Cell Size: 1
+      Cell Size: 100
       Class: rviz/Grid
       Color: 160; 160; 164
       Enabled: true
@@ -52,7 +53,7 @@ Visualization Manager:
         Z: 0
       Plane: XY
       Plane Cell Count: 10
-      Reference Frame: <Fixed Frame>
+      Reference Frame: odom
       Value: true
     - Class: rviz/Image
       Enabled: true
@@ -219,7 +220,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 891.5161743164062
+      Distance: 1020.5882568359375
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -227,17 +228,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 156.62503051757812
+        Y: -7.132233619689941
+        Z: 7.033581733703613
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4553982019424438
+      Pitch: 1.2297964096069336
       Target Frame: <Fixed Frame>
-      Yaw: 3.7972023487091064
+      Yaw: 3.2871994972229004
     Saved: ~
 Window Geometry:
   Displays:
