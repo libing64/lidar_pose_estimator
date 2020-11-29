@@ -219,7 +219,7 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 
 ## 4. record screen with byzanz
 ```
-byzanz-record --delay 10 -d 30
+byzanz-record --delay 10 -d 30 lidar_pose_estimator.gif
 ```
 
 
@@ -243,3 +243,5 @@ direction of x y z: right-forward-up
 
 
 # 6. reference
+* LOAM: Lidar Odometry and Mapping in Real-time
+* An ICP variant using a point-to-line metric
