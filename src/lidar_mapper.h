@@ -5,26 +5,10 @@
 #include "lidar_pose_graph.h"
 #include <nav_msgs/Odometry.h>
 #include <Eigen/Eigen>
+#include "math_utils.h"
+
 
 using namespace Eigen;
-
-Eigen::Vector3d point2eigen(PointType p)
-{
-    Eigen::Vector3d pp;
-    pp(0) = p.x;
-    pp(1) = p.y;
-    pp(2) = p.z;
-    return pp;
-}
-
-PointType eigen2point(Eigen::Vector3d pp)
-{
-    PointType p;
-    p.x = pp(0);
-    p.y = pp(1);
-    p.z = pp(2);
-    return p;
-}
 
 class lidar_mapper
 {
@@ -68,6 +52,10 @@ public:
     void cloud_transform(pcl::PointCloud<PointType>& cloudin, pcl::PointCloud<PointType>&cloudout, Quaterniond q, Vector3d t);
     void update(const sensor_msgs::PointCloud2ConstPtr &edge_points_msg,
                 const sensor_msgs::PointCloud2ConstPtr &planar_points_msg);
+
+    void update(pcl::PointCloud<PointType> &edge_cloud,
+                pcl::PointCloud<PointType> &planar_cloud);
+
     void update_feature_map();
     void transform_update();
 };
@@ -88,10 +76,12 @@ void lidar_mapper::fit_plane(pcl::PointCloud<PointType> &cloud, Vector3d& center
 {
     int n = cloud.points.size();
     MatrixXd points = MatrixXd::Zero(3, n);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < n; i++)
     {
         points.col(i) = point2eigen(cloud.points[i]);
     }
+    cout << endl << "points: " << points << endl;
+
     center = points.rowwise().mean();
     points.colwise() -= center;
 
@@ -106,10 +96,11 @@ void lidar_mapper::fit_line(pcl::PointCloud<PointType> &cloud, Vector3d &center,
 {
     int n = cloud.points.size();
     MatrixXd points = MatrixXd::Zero(3, n);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < n; i++)
     {
         points.col(i) = point2eigen(cloud.points[i]);
     }
+    cout << endl << "points: " << points << endl;
     center = points.rowwise().mean();
     points.colwise() -= center;
     JacobiSVD<MatrixXd> svd(points, ComputeFullU);
@@ -200,16 +191,22 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
+            cout << "edge index size: " << index.size() << endl;
+            searched_points.resize(index.size());
             //cout << "edge i: " << i << "  index size: " << index.size() << endl;
             for (int j = 0; j < index.size(); j++)
             {
-                searched_points.points.push_back(edge_point_map.points[index[j]]);
+                cout << "j " << j << "  " << edge_point_map.points[index[j]] << endl;
+                searched_points.points[j]= edge_point_map.points[index[j]];
             }
             //add constraints
             Eigen::Vector3d p = point2eigen(search_point);
             Vector3d center, u;
             fit_line(searched_points, center, u);
 
+            cout << "p: " << p.transpose() << endl;
+            cout << "center: " << center.transpose() << endl;
+            cout << "u: " << u.transpose() << endl;
             ceres::CostFunction *cost_function = lidar_line_error::Create(p, center, u);
             problem.AddResidualBlock(cost_function,
                                      new CauchyLoss(0.5),
@@ -226,15 +223,23 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
+
+            cout << "planar index size: " << index.size() << endl;
+            searched_points.resize(index.size());
             //cout << "planar i: " << i << "  index size: " << index.size() << endl;
             //add constraints
             for (int j = 0; j < index.size(); j++)
             {
-                searched_points.points.push_back(edge_point_map.points[index[j]]);
+                cout << "j " << j << "  " << planar_point_map.points[index[j]] << endl;
+                searched_points.points[j] = planar_point_map.points[index[j]];
             }
             Vector3d center, normal;
             fit_plane(searched_points, center, normal);
             Eigen::Vector3d p = point2eigen(search_point);
+
+            cout << "p: " << p.transpose() << endl;
+            cout << "center: " << center.transpose() << endl;
+            cout << "normal: " << normal.transpose() << endl;
             ceres::CostFunction *cost_function = lidar_plane_error::Create(p, center, normal);
             problem.AddResidualBlock(cost_function,
                                      new CauchyLoss(0.5),
@@ -244,13 +249,13 @@ void lidar_mapper::transform_update()
 
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_SCHUR;
-    options.minimizer_progress_to_stdout = false;
+    options.minimizer_progress_to_stdout = true;
 
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
-    //std::cout << summary.FullReport() << "\n";
+    std::cout << summary.FullReport() << "\n";
 
-    //printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
+    printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
 
     double qq[4];
     ceres::AngleAxisToQuaternion(pose, qq);
@@ -294,6 +299,26 @@ void lidar_mapper::update(const sensor_msgs::PointCloud2ConstPtr &edge_points_ms
     timestamp = edge_points_msg->header.stamp.toSec();
 
     readin_cloud_data(edge_points_msg, planar_points_msg);
+
+    cloud_transform(edge_points, g_edge_points, qk, tk);
+    cloud_transform(planar_points, g_planar_points, qk, tk);
+
+    transform_update();
+
+    update_feature_map();
+
+    double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
+    printf("mapper update cost %lfs", dt);
+}
+
+void lidar_mapper::update(pcl::PointCloud<PointType> &edge_cloud,
+                          pcl::PointCloud<PointType> &planar_cloud)
+{
+    clock_t start = clock();
+    
+
+    edge_points = edge_cloud;
+    planar_points = planar_cloud;
 
     cloud_transform(edge_points, g_edge_points, qk, tk);
     cloud_transform(planar_points, g_planar_points, qk, tk);

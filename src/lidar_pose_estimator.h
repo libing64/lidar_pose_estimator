@@ -4,24 +4,8 @@
 #include "lidar_preprocessor.h"
 #include "lidar_pose_graph.h"
 #include <Eigen/Eigen>
+#include "math_utils.h"
 
-Eigen::Vector3d point2eigen(PointType p)
-{
-    Eigen::Vector3d pp;
-    pp(0) = p.x;
-    pp(1) = p.y;
-    pp(2) = p.z;
-    return pp;
-}
-
-PointType eigen2point(Eigen::Vector3d pp)
-{
-    PointType p;
-    p.x = pp(0);
-    p.y = pp(1);
-    p.z = pp(2);
-    return p;
-}
 
 class lidar_pose_estimator
 {

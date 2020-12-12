@@ -1,5 +1,6 @@
 #include "lidar_preprocessor.h"
 #include "lidar_pose_estimator.h"
+#include "lidar_mapper.h"
 #include <iostream>
 #include <Eigen/Eigen>
 #include <pcl/point_cloud.h>
@@ -34,11 +35,17 @@ int main(int argc, char** argv)
     lidar_pose_estimator estimator;
     estimator.lidar_prev.process(filename_prev);
     estimator.lidar.process(filename);
-
     estimator.transform_update();
 
     double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
     cout << "cost time: " << dt << endl;
+
+    lidar_mapper mapper;
+    mapper.update(estimator.lidar_prev.edge_points_mapping, estimator.lidar_prev.planar_points_mapping);
+
+    mapper.qk = estimator.q;
+    mapper.tk = estimator.t;
+    mapper.update(estimator.lidar.edge_points_mapping, estimator.lidar.planar_points_mapping);
 
     return 0;
 }
