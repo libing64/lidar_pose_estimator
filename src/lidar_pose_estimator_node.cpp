@@ -101,6 +101,7 @@ void publish_cloud(lidar_pose_estimator &estimator)
     std_msgs::Header header;
     header.stamp = ros::Time(estimator.timestamp);
     header.frame_id = "base_link";
+    
     edge_points_msg.header = header;
     planar_points_msg.header = header;
 

@@ -152,7 +152,7 @@ int main(int argc, char **argv)
         sensor_msgs::PointCloud2 laser_cloud_msg;
         pcl::toROSMsg(laser_cloud, laser_cloud_msg);
         laser_cloud_msg.header.stamp = ros::Time().fromSec(timestamp);
-        laser_cloud_msg.header.frame_id = fixed_frame_id;
+        laser_cloud_msg.header.frame_id = "base_link";
         pub_laser_cloud.publish(laser_cloud_msg);
 
         sensor_msgs::ImagePtr image_left_msg = cv_bridge::CvImage(laser_cloud_msg.header, "mono8", left_image).toImageMsg();
