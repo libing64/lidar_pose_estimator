@@ -4,13 +4,14 @@
             "name": "Linux",
             "includePath": [
                 "${default}",
-                "/usr/include/eigen3",
-                "/opt/ros/noetic/include",
-                "/opt/ros/noetic",
-                "/usr/include/pcl-1.10",
+                "/usr/include/",
+                "/usr/include/eigen3/",
+                "/opt/ros/noetic/include/",
+                "/opt/ros/noetic/",
+                "/usr/include/pcl-1.10/",
                 "src",
-                "/usr/include/ceres",
-                "/usr/include/vtk-7.1"
+                "/usr/include/ceres/",
+                "/usr/include/vtk-7.1/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
