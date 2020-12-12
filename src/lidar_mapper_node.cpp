@@ -34,7 +34,10 @@ void cloud_points_callback(const sensor_msgs::PointCloud2ConstPtr &edge_points_m
                            const sensor_msgs::PointCloud2ConstPtr &planar_points_msg, 
                            const nav_msgs::OdometryConstPtr& odom_msg)
 {
+    Odometry odom = *odom_msg;
+    mapper.predict(odom);
     cout << "cloud msg received" << endl;
+    mapper.update(edge_points_msg, planar_points_msg);
 }
 
 void publish_odom(lidar_mapper& mapper)

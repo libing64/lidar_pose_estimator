@@ -83,6 +83,64 @@ struct lidar_edge_error
     Eigen::Vector3d p2;
 };
 
+struct lidar_line_error
+{
+    lidar_line_error(const Eigen::Vector3d p, const Eigen::Vector3d center, const Eigen::Vector3d u)
+        : p(p), center(center), u(u) {}
+
+    template <typename T>
+    bool operator()(const T *const pose,
+                    T *residuals) const
+    {
+        // pose[0,1,2] are the angle-axis rotation.
+        T pi[3];
+        pi[0] = T(p(0));
+        pi[1] = T(p(1));
+        pi[2] = T(p(2));
+
+        T pi_proj[3]; //project pi to current frame
+        AngleAxisRotatePoint(pose, pi, pi_proj);
+
+        // pose[3,4,5] are the translation.
+        pi_proj[0] += pose[3];
+        pi_proj[1] += pose[4];
+        pi_proj[2] += pose[5];
+
+        //distance between pi_proj to line(center, u)
+        T delta[3], uu[3];
+
+
+        delta[0] = pi_proj[0] - T(center(0));
+        delta[1] = pi_proj[1] - T(center(1));
+        delta[2] = pi_proj[2] - T(center(2));
+
+        uu[0] = T(u(0));
+        uu[1] = T(u(1));
+        uu[2] = T(u(2));
+
+        T cross[3];
+        CrossProduct(delta, uu, cross);
+
+        T norm = sqrt(cross[0] * cross[0] + cross[1] * cross[1] + cross[2] * cross[2]);
+        T weight = T(10.0);
+        residuals[0] = weight * norm;
+        return true;
+    }
+
+    // Factory to hide the construction of the CostFunction object from
+    // the client code.
+    static ceres::CostFunction *Create(const Eigen::Vector3d p, const Eigen::Vector3d center, const Eigen::Vector3d u)
+    {
+        return (new ceres::AutoDiffCostFunction<lidar_line_error, 1, 6>(
+            new lidar_line_error(p, center, u)));
+    }
+
+    //project point p to line (center - u)
+    Eigen::Vector3d p;
+    Eigen::Vector3d center;
+    Eigen::Vector3d u;
+};
+
 struct lidar_planar_error
 {
     lidar_planar_error(const Eigen::Vector3d p, const Eigen::Vector3d p1, const Eigen::Vector3d p2, const Eigen::Vector3d p3)
@@ -147,6 +205,58 @@ struct lidar_planar_error
     Eigen::Vector3d p1;
     Eigen::Vector3d p2;
     Eigen::Vector3d p3;
+};
+
+struct lidar_plane_error
+{
+    lidar_plane_error(const Eigen::Vector3d p, const Eigen::Vector3d center, const Eigen::Vector3d normal)
+        : p(p), center(center), normal(normal) {}
+
+    template <typename T>
+    bool operator()(const T *const pose,
+                    T *residuals) const
+    {
+        // pose[0,1,2] are the angle-axis rotation.
+        T pi[3];
+        pi[0] = T(p(0));
+        pi[1] = T(p(1));
+        pi[2] = T(p(2));
+
+        T pi_proj[3]; //project pi to current frame
+        AngleAxisRotatePoint(pose, pi, pi_proj);
+
+        // pose[3,4,5] are the translation.
+        pi_proj[0] += pose[3];
+        pi_proj[1] += pose[4];
+        pi_proj[2] += pose[5];
+
+        //normal vector of plane (center, normal, p3)
+        T delta[3];
+        delta[0] = pi_proj[0] - T(center(0));
+        delta[1] = pi_proj[1] - T(center(1));
+        delta[2] = pi_proj[2] - T(center(2));
+
+        T normal_vec[3];
+        normal_vec[0] = T(normal(0));
+        normal_vec[1] = T(normal(1));
+        normal_vec[2] = T(normal(2));
+
+        residuals[0] = DotProduct(delta, normal_vec);
+        return true;
+    }
+
+    // Factory to hide the construction of the CostFunction object from
+    // the client code.
+    static ceres::CostFunction *Create(const Eigen::Vector3d p, const Eigen::Vector3d center, const Eigen::Vector3d normal)
+    {
+        return (new ceres::AutoDiffCostFunction<lidar_plane_error, 1, 6>(
+            new lidar_plane_error(p, center, normal)));
+    }
+
+    //project point p to plane (center - normal - p3)
+    Eigen::Vector3d p;
+    Eigen::Vector3d center;
+    Eigen::Vector3d normal;
 };
 
 #endif

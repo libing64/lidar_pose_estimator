@@ -10,6 +10,9 @@
         <param name="publish_delay" type="int" value="1" />
     </node>
 
-    <node pkg="lidar_pose_estimator" type="lidar_pose_estimator_node" name="lidar_pose_estimator_node" output="screen" />
+    <node pkg="lidar_pose_estimator" type="lidar_pose_estimator_node" name="lidar_pose_estimator_node" output="log" />
+    
+    <node pkg="lidar_pose_estimator" type="lidar_mapper_node" name="lidar_mapper_node" output="screen" />
+    
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lidar_pose_estimator)/rviz_cfg/kitti_velodyne.rviz"/>
 </launch>
