@@ -1,7 +1,7 @@
 <launch>
     
 
-    <node name="kitti_loader" pkg="lidar_pose_estimator" type="kitti_loader" output="screen"> 
+    <node name="kitti_loader" pkg="lidar_pose_estimator" type="kitti_loader" output="log"> 
         <param name="dataset_folder" type="string" value="/home/libing/data/kitti_raw/" />
         <param name="sequence_number" type="string" value="02" />
         <param name="to_bag" type="bool" value="false" />

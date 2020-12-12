@@ -87,21 +87,25 @@ lidar_mapper::~lidar_mapper()
 void lidar_mapper::fit_plane(pcl::PointCloud<PointType> &cloud, Vector3d& center, Vector3d& normal)
 {
     int n = cloud.points.size();
-    VectorXd points = VectorXd::Zero(3, n);
+    MatrixXd points = MatrixXd::Zero(3, n);
     for (int i = 0; i < 3; i++)
     {
         points.col(i) = point2eigen(cloud.points[i]);
     }
     center = points.rowwise().mean();
     points.colwise() -= center;
+
     JacobiSVD<MatrixXd> svd(points, ComputeFullU);
     normal = svd.matrixU().col(2);
+
+    //cout << "center: " << center.transpose() << endl;
+    //cout << "normal: " << normal.transpose() << endl;
 }
 
 void lidar_mapper::fit_line(pcl::PointCloud<PointType> &cloud, Vector3d &center, Vector3d& u)
 {
     int n = cloud.points.size();
-    VectorXd points = VectorXd::Zero(3, n);
+    MatrixXd points = MatrixXd::Zero(3, n);
     for (int i = 0; i < 3; i++)
     {
         points.col(i) = point2eigen(cloud.points[i]);
@@ -184,7 +188,7 @@ void lidar_mapper::transform_update()
 
     pcl::KdTreeFLANN<PointType> kdtree;
     kdtree.setInputCloud(edge_point_map.makeShared());
-    int K = 2; // K nearest neighbor search
+    int K = 3; // at least 3 points for svd
     std::vector<int> index;
     std::vector<float> distance;
     double radius = search_range;
@@ -196,6 +200,7 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
+            cout << "edge i: " << i << "  index size: " << index.size() << endl;
             for (int j = 0; j < index.size(); j++)
             {
                 searched_points.points.push_back(edge_point_map.points[index[j]]);
@@ -219,8 +224,9 @@ void lidar_mapper::transform_update()
     {
         PointType search_point = g_planar_points.points[i];
         pcl::PointCloud<PointType> searched_points;
-        if (kdtree.nearestKSearch(search_point, radius, index, distance) >= K)
+        if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
+            cout << "planar i: " << i << "  index size: " << index.size() << endl;
             //add constraints
             for (int j = 0; j < index.size(); j++)
             {
