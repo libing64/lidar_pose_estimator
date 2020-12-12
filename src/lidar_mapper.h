@@ -264,8 +264,8 @@ void lidar_mapper::transform_update()
     dq.y() = qq[2];
     dq.z() = qq[3];
 
-    q = dq * q;
-    t = dt + dq.toRotationMatrix() * t;
+    q = dq * qk;
+    t = dt + dq.toRotationMatrix() * tk;
 
     qk = q;
     tk = t;

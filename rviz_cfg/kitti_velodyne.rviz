@@ -11,6 +11,7 @@ Panels:
         - /mapping1/velodyne_points1
         - /mapping1/edge_points1
         - /mapping1/planar_points1
+        - /Path3
       Splitter Ratio: 0.5852941274642944
     Tree Height: 373
   - Class: rviz/Selection
@@ -211,9 +212,9 @@ Visualization Manager:
           Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
-          Max Intensity: 3.690563440322876
+          Max Intensity: 14.89072322845459
           Min Color: 0; 0; 0
-          Min Intensity: 0.08015017956495285
+          Min Intensity: 0.08006466180086136
           Name: edge_points
           Position Transformer: XYZ
           Queue Size: 10
@@ -241,9 +242,9 @@ Visualization Manager:
           Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
-          Max Intensity: 0.009954571723937988
+          Max Intensity: 0.009998485445976257
           Min Color: 0; 0; 0
-          Min Intensity: 0.0001270287757506594
+          Min Intensity: 2.586178652563831e-06
           Name: planar_points
           Position Transformer: XYZ
           Queue Size: 10
@@ -258,6 +259,30 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: mapping
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 0; 0; 255
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Queue Size: 10
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic: /path_mapper
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -286,7 +311,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1015.0739135742188
+      Distance: 503.2434387207031
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -294,17 +319,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 156.62503051757812
-        Y: -7.132233619689941
-        Z: 7.033581733703613
+        X: 291.8763732910156
+        Y: -419.1893615722656
+        Z: -2.9752683639526367
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5147963762283325
+      Pitch: 1.5647963285446167
       Target Frame: <Fixed Frame>
-      Yaw: 4.627198219299316
+      Yaw: 4.652198314666748
     Saved: ~
 Window Geometry:
   Displays:
