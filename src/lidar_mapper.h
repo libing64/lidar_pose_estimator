@@ -177,11 +177,11 @@ void lidar_mapper::transform_update()
     {
         return;
     }
-    std::cout << "edge point size: " << edge_points.points.size() << std::endl;
-    std::cout << "edge point map size: " << edge_point_map.points.size() << std::endl;
+    // std::cout << "edge point size: " << edge_points.points.size() << std::endl;
+    // std::cout << "edge point map size: " << edge_point_map.points.size() << std::endl;
 
-    std::cout << "planar point size: " << planar_points.points.size() << std::endl;
-    std::cout << "planar point map size: " << planar_point_map.points.size() << std::endl;
+    // std::cout << "planar point size: " << planar_points.points.size() << std::endl;
+    // std::cout << "planar point map size: " << planar_point_map.points.size() << std::endl;
     //ceres optimization
     double pose[6] = {0, 0, 0, 0, 0, 0}; //0-2 for roation and 3-5 for tranlation
     Problem problem;
@@ -200,7 +200,7 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
-            cout << "edge i: " << i << "  index size: " << index.size() << endl;
+            //cout << "edge i: " << i << "  index size: " << index.size() << endl;
             for (int j = 0; j < index.size(); j++)
             {
                 searched_points.points.push_back(edge_point_map.points[index[j]]);
@@ -226,7 +226,7 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
-            cout << "planar i: " << i << "  index size: " << index.size() << endl;
+            //cout << "planar i: " << i << "  index size: " << index.size() << endl;
             //add constraints
             for (int j = 0; j < index.size(); j++)
             {
@@ -303,7 +303,7 @@ void lidar_mapper::update(const sensor_msgs::PointCloud2ConstPtr &edge_points_ms
     update_feature_map();
 
     double dt = ((double)clock() - start) / CLOCKS_PER_SEC;
-    printf("lidar update cost %lfs", dt);
+    printf("mapper update cost %lfs", dt);
 }
 
 #endif

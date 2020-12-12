@@ -33,11 +33,19 @@ public:
     const float planar_point_thresh = 0.01;
     const float min_dist_thresh = 0.1;//min distance for selecting features
     bool vis_enable = false;
+    const int edge_points_per_seg = 2;
+    const int planar_points_per_seg = 4;
+    const int edge_points_mapping_per_seg = 20;
+    const int planar_points_mapping_per_seg = 40;
 
     vector<float> curvature;
     pcl::PointCloud<PointType> lidar_cloud;
     pcl::PointCloud<PointType> edge_points;
     pcl::PointCloud<PointType> planar_points;
+
+    //edge and planar features for mapping
+    pcl::PointCloud<PointType> edge_points_mapping;
+    pcl::PointCloud<PointType> planar_points_mapping;
 
     lidar_preprocessor();
     ~lidar_preprocessor();
@@ -49,7 +57,10 @@ public:
     void visualize_cloud(pcl::PointCloud<PointType>::Ptr ptr, std::string str);
     void get_cloud_curvature();
     float distance(PointType p);
-    void get_feature_points();
+    void get_feature_points(int edge_points_per_seg, int planar_points_per_seg, 
+                            pcl::PointCloud<PointType>& edge_points,
+                            pcl::PointCloud<PointType>& planar_points);
+    
     void remove_invalid_points(pcl::PointCloud<PointType> &cloud, vector<int>& valid_index);
     void remove_neighbor_feature(pcl::PointCloud<PointType> &cloud);
     void process(string filename);
@@ -168,7 +179,9 @@ void lidar_preprocessor::get_cloud_curvature()
     }
 }
 
-void lidar_preprocessor::get_feature_points()
+void lidar_preprocessor::get_feature_points(int edge_points_per_seg, int planar_points_per_seg,
+                                            pcl::PointCloud<PointType> &edge_points,
+                                            pcl::PointCloud<PointType> &planar_points)
 {
     int seg_len = lidar_cloud.points.size() / splite_cnt;
     edge_points.clear();
@@ -178,23 +191,25 @@ void lidar_preprocessor::get_feature_points()
         int left = i * seg_len;
         int right = (i + 1) * seg_len - 1;
         std::sort(lidar_cloud.points.begin() + left, lidar_cloud.points.begin() + right, comp);
-        PointType edge = *(lidar_cloud.points.begin() + right);
-        PointType planar = *(lidar_cloud.points.begin() + left);
-        PointType planar2 = *(lidar_cloud.points.begin() + left + 1);
-        if (edge.intensity > edge_point_thresh )
+
+        for (int j = 0; j < edge_points_per_seg; j++)
         {
-            edge_points.push_back(edge);
+            PointType edge = *(lidar_cloud.points.begin() + right - j);
+            if (edge.intensity > edge_point_thresh)
+            {
+                edge_points.push_back(edge);
+            }
         }
-        if (planar.intensity < planar_point_thresh)
+
+        for (int j = 0; j < planar_points_per_seg; j++)
         {
-            planar_points.push_back(planar);
-        }
-        if (planar2.intensity < planar_point_thresh)
-        {
-            planar_points.push_back(planar2);
+            PointType planar = *(lidar_cloud.points.begin() + left + j);
+            if (planar.intensity < planar_point_thresh)
+            {
+                planar_points.push_back(planar);
+            }
         }
     }
-
     visualize_cloud(edge_points.makeShared(), "edge");
     visualize_cloud(planar_points.makeShared(), "planar");
 }
@@ -266,9 +281,11 @@ void lidar_preprocessor::process(string filename)
     readin_lidar_cloud(filename);
     remove_invalid_data();
     get_cloud_curvature();
-    get_feature_points();
+    get_feature_points(edge_points_per_seg, planar_points_per_seg, edge_points, planar_points);
     remove_neighbor_feature(edge_points);
     remove_neighbor_feature(planar_points);
+    //features for mapping
+    get_feature_points(edge_points_mapping_per_seg, planar_points_mapping_per_seg, edge_points_mapping, planar_points_mapping);
 }
 
 void lidar_preprocessor::process(const sensor_msgs::PointCloud2ConstPtr &msg)
@@ -276,9 +293,11 @@ void lidar_preprocessor::process(const sensor_msgs::PointCloud2ConstPtr &msg)
     pcl::fromROSMsg(*msg, lidar_cloud);
     remove_invalid_data();
     get_cloud_curvature();
-    get_feature_points();
+    get_feature_points(edge_points_per_seg, planar_points_per_seg, edge_points, planar_points);
     remove_neighbor_feature(edge_points);
     remove_neighbor_feature(planar_points);
+    //features for mapping
+    get_feature_points(edge_points_mapping_per_seg, planar_points_mapping_per_seg, edge_points_mapping, planar_points_mapping);
 }
 
 #endif

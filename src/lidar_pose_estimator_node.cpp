@@ -32,7 +32,13 @@ void velodyne_points_callback(const sensor_msgs::PointCloud2ConstPtr &msg)
     estimator.update(msg);
     publish_odom(estimator);
     publish_pose(estimator);
-    publish_cloud(estimator);
+
+
+    static int cnt = 0;
+
+    if (cnt % 10 == 0)
+        publish_cloud(estimator);
+    cnt++;
 }
 
 void publish_odom(lidar_pose_estimator& estimator)
@@ -95,13 +101,13 @@ void publish_pose(lidar_pose_estimator &estimator)
 void publish_cloud(lidar_pose_estimator &estimator)
 {
     sensor_msgs::PointCloud2 edge_points_msg, planar_points_msg;
-    pcl::toROSMsg(estimator.lidar.edge_points, edge_points_msg);
-    pcl::toROSMsg(estimator.lidar.planar_points, planar_points_msg);
+    pcl::toROSMsg(estimator.lidar.edge_points_mapping, edge_points_msg);
+    pcl::toROSMsg(estimator.lidar.planar_points_mapping, planar_points_msg);
 
     std_msgs::Header header;
     header.stamp = ros::Time(estimator.timestamp);
     header.frame_id = "base_link";
-    
+
     edge_points_msg.header = header;
     planar_points_msg.header = header;
 
