@@ -139,8 +139,14 @@ void lidar_mapper::predict(nav_msgs::Odometry &odom)
 
         qk = q * dq;
         tk = t + dt;
+    } else 
+    {
+        odometry2transform(odom, q, t);
+        qk = q;
+        tk = t;
+        is_odom_init = true;
     }
-    is_odom_init = true;
+
     odom_prev = odom;
 }
 void lidar_mapper::readin_cloud_data(const sensor_msgs::PointCloud2ConstPtr &edge_points_msg,
@@ -163,6 +169,10 @@ void lidar_mapper::cloud_transform(pcl::PointCloud<PointType> &cloudin, pcl::Poi
 
 void lidar_mapper::transform_update()
 {
+    if (planar_point_map.empty() || edge_point_map.empty())
+    {
+        return;
+    }
     std::cout << "edge point size: " << edge_points.points.size() << std::endl;
     std::cout << "edge point map size: " << edge_point_map.points.size() << std::endl;
 
