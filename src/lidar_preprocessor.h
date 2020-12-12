@@ -257,6 +257,9 @@ void lidar_preprocessor::remove_neighbor_feature(pcl::PointCloud<PointType> &clo
     }
     remove_invalid_points(cloud, valid_index);
 
+    cloud.width = cloud.points.size();
+    cloud.height = 1;
+
 }
 void lidar_preprocessor::process(string filename)
 {

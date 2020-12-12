@@ -20,41 +20,46 @@
 
 lidar_pose_estimator estimator;
 ros::Publisher pub_odom, pub_pose, pub_path;
-void publish_odom(lidar_pose_estimator& est);
-void publish_pose(lidar_pose_estimator &est);
+ros::Publisher pub_edge_points, pub_planar_points;
+
+void publish_odom(lidar_pose_estimator& estimator);
+void publish_pose(lidar_pose_estimator &estimator);
+void publish_cloud(lidar_pose_estimator &estimator);
+
 
 void velodyne_points_callback(const sensor_msgs::PointCloud2ConstPtr &msg)
 {
     estimator.update(msg);
     publish_odom(estimator);
     publish_pose(estimator);
+    publish_cloud(estimator);
 }
 
-void publish_odom(lidar_pose_estimator& est)
+void publish_odom(lidar_pose_estimator& estimator)
 {
     nav_msgs::Odometry odometry;
     odometry.header.frame_id = "odom";
-    odometry.header.stamp = ros::Time(est.timestamp);
+    odometry.header.stamp = ros::Time(estimator.timestamp);
 
     odometry.child_frame_id = "base_link";
-    odometry.pose.pose.position.x = est.t(0);
-    odometry.pose.pose.position.y = est.t(1);
-    odometry.pose.pose.position.z = est.t(2);
-    odometry.pose.pose.orientation.x = est.q.x();
-    odometry.pose.pose.orientation.y = est.q.y();
-    odometry.pose.pose.orientation.z = est.q.z();
-    odometry.pose.pose.orientation.w = est.q.w();
+    odometry.pose.pose.position.x = estimator.t(0);
+    odometry.pose.pose.position.y = estimator.t(1);
+    odometry.pose.pose.position.z = estimator.t(2);
+    odometry.pose.pose.orientation.x = estimator.q.x();
+    odometry.pose.pose.orientation.y = estimator.q.y();
+    odometry.pose.pose.orientation.z = estimator.q.z();
+    odometry.pose.pose.orientation.w = estimator.q.w();
     pub_odom.publish(odometry);
 }
 
-void publish_pose(lidar_pose_estimator &est)
+void publish_pose(lidar_pose_estimator &estimator)
 {
     static nav_msgs::Path path;
     geometry_msgs::PoseStamped pose;
-    Eigen::Quaterniond q = est.q;
-    Eigen::Vector3d p = est.t;
+    Eigen::Quaterniond q = estimator.q;
+    Eigen::Vector3d p = estimator.t;
 
-    pose.header.stamp = ros::Time(est.timestamp);
+    pose.header.stamp = ros::Time(estimator.timestamp);
     pose.header.frame_id = "odom";
     pose.pose.orientation.w = q.w();
     pose.pose.orientation.x = q.x();
@@ -73,6 +78,23 @@ void publish_pose(lidar_pose_estimator &est)
 
 }
 
+void publish_cloud(lidar_pose_estimator &estimator)
+{
+    sensor_msgs::PointCloud2 edge_points_msg, planar_points_msg;
+    pcl::toROSMsg(estimator.lidar.edge_points, edge_points_msg);
+    pcl::toROSMsg(estimator.lidar.planar_points, planar_points_msg);
+
+    std_msgs::Header header;
+    header.stamp = ros::Time(estimator.timestamp);
+    header.frame_id = "base_link";
+    edge_points_msg.header = header;
+    planar_points_msg.header = header;
+
+    pub_edge_points.publish(edge_points_msg);
+    pub_planar_points.publish(planar_points_msg);
+    
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "lidar_pose_estimator");
@@ -83,6 +105,9 @@ int main(int argc, char **argv)
 
     pub_pose = nh.advertise<geometry_msgs::PoseStamped>("/est_pose", 10);
     pub_path = nh.advertise<nav_msgs::Path>("/path", 10);
+
+    pub_edge_points = nh.advertise<sensor_msgs::PointCloud2>("/edge_points", 10);
+    pub_planar_points = nh.advertise<sensor_msgs::PointCloud2>("/planar_points", 10);
     //ros::Rate rate(100);
     ros::spin();
     return 0;
