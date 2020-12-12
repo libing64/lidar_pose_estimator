@@ -27,8 +27,10 @@ using namespace nav_msgs;
 
 lidar_mapper mapper;
 ros::Publisher pub_odom, pub_pose, pub_path;
+ros::Publisher pub_edge_points, pub_planar_points;
 void publish_odom(lidar_mapper& mapper);
 void publish_pose(lidar_mapper &mapper);
+void publish_cloud(lidar_mapper &mapper);
 
 void cloud_points_callback(const sensor_msgs::PointCloud2ConstPtr &edge_points_msg,
                            const sensor_msgs::PointCloud2ConstPtr &planar_points_msg, 
@@ -38,6 +40,9 @@ void cloud_points_callback(const sensor_msgs::PointCloud2ConstPtr &edge_points_m
     mapper.predict(odom);
     cout << "cloud msg received" << endl;
     mapper.update(edge_points_msg, planar_points_msg);
+    publish_pose(mapper);
+    publish_odom(mapper);
+    publish_cloud(mapper);
 }
 
 void publish_odom(lidar_mapper& mapper)
@@ -83,6 +88,24 @@ void publish_pose(lidar_mapper &mapper)
 
 }
 
+void publish_cloud(lidar_mapper &mapper)
+{
+    sensor_msgs::PointCloud2 edge_points_msg, planar_points_msg;
+    pcl::toROSMsg(mapper.edge_point_map, edge_points_msg);
+    pcl::toROSMsg(mapper.planar_point_map, planar_points_msg);
+
+    std_msgs::Header header;
+    header.stamp = ros::Time(mapper.timestamp);
+    header.frame_id = "base_link";
+
+    edge_points_msg.header = header;
+    planar_points_msg.header = header;
+
+    pub_edge_points.publish(edge_points_msg);
+    pub_planar_points.publish(planar_points_msg);
+    
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "lidar_mapper");
@@ -98,6 +121,9 @@ int main(int argc, char **argv)
 
     pub_pose = nh.advertise<geometry_msgs::PoseStamped>("/pose_mapper", 10);
     pub_path = nh.advertise<nav_msgs::Path>("/path_mapper", 10);
+
+    pub_edge_points = nh.advertise<sensor_msgs::PointCloud2>("/edge_point_map", 10);
+    pub_planar_points = nh.advertise<sensor_msgs::PointCloud2>("/planar_point_map", 10);
     //ros::Rate rate(100);
     ros::spin();
     return 0;

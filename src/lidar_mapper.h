@@ -80,8 +80,6 @@ void lidar_mapper::fit_plane(pcl::PointCloud<PointType> &cloud, Vector3d& center
     {
         points.col(i) = point2eigen(cloud.points[i]);
     }
-    cout << endl << "points: " << points << endl;
-
     center = points.rowwise().mean();
     points.colwise() -= center;
 
@@ -100,7 +98,6 @@ void lidar_mapper::fit_line(pcl::PointCloud<PointType> &cloud, Vector3d &center,
     {
         points.col(i) = point2eigen(cloud.points[i]);
     }
-    cout << endl << "points: " << points << endl;
     center = points.rowwise().mean();
     points.colwise() -= center;
     JacobiSVD<MatrixXd> svd(points, ComputeFullU);
@@ -191,12 +188,12 @@ void lidar_mapper::transform_update()
         pcl::PointCloud<PointType> searched_points;
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
-            cout << "edge index size: " << index.size() << endl;
+            //cout << "edge index size: " << index.size() << endl;
             searched_points.resize(index.size());
             //cout << "edge i: " << i << "  index size: " << index.size() << endl;
             for (int j = 0; j < index.size(); j++)
             {
-                cout << "j " << j << "  " << edge_point_map.points[index[j]] << endl;
+                //cout << "j " << j << "  " << edge_point_map.points[index[j]] << endl;
                 searched_points.points[j]= edge_point_map.points[index[j]];
             }
             //add constraints
@@ -204,9 +201,9 @@ void lidar_mapper::transform_update()
             Vector3d center, u;
             fit_line(searched_points, center, u);
 
-            cout << "p: " << p.transpose() << endl;
-            cout << "center: " << center.transpose() << endl;
-            cout << "u: " << u.transpose() << endl;
+            // cout << "p: " << p.transpose() << endl;
+            // cout << "center: " << center.transpose() << endl;
+            // cout << "u: " << u.transpose() << endl;
             ceres::CostFunction *cost_function = lidar_line_error::Create(p, center, u);
             problem.AddResidualBlock(cost_function,
                                      new CauchyLoss(0.5),
@@ -224,22 +221,22 @@ void lidar_mapper::transform_update()
         if (kdtree.radiusSearch(search_point, radius, index, distance) >= K)
         {
 
-            cout << "planar index size: " << index.size() << endl;
+            //cout << "planar index size: " << index.size() << endl;
             searched_points.resize(index.size());
             //cout << "planar i: " << i << "  index size: " << index.size() << endl;
             //add constraints
             for (int j = 0; j < index.size(); j++)
             {
-                cout << "j " << j << "  " << planar_point_map.points[index[j]] << endl;
+                //cout << "j " << j << "  " << planar_point_map.points[index[j]] << endl;
                 searched_points.points[j] = planar_point_map.points[index[j]];
             }
             Vector3d center, normal;
             fit_plane(searched_points, center, normal);
             Eigen::Vector3d p = point2eigen(search_point);
 
-            cout << "p: " << p.transpose() << endl;
-            cout << "center: " << center.transpose() << endl;
-            cout << "normal: " << normal.transpose() << endl;
+            // cout << "p: " << p.transpose() << endl;
+            // cout << "center: " << center.transpose() << endl;
+            // cout << "normal: " << normal.transpose() << endl;
             ceres::CostFunction *cost_function = lidar_plane_error::Create(p, center, normal);
             problem.AddResidualBlock(cost_function,
                                      new CauchyLoss(0.5),
@@ -249,11 +246,11 @@ void lidar_mapper::transform_update()
 
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_SCHUR;
-    options.minimizer_progress_to_stdout = true;
+    options.minimizer_progress_to_stdout = false;
 
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
-    std::cout << summary.FullReport() << "\n";
+    //std::cout << summary.FullReport() << "\n";
 
     printf("result: %lf, %lf, %lf, %lf, %lf, %lf\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
 
