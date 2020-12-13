@@ -199,22 +199,29 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 ```
 
 
+## 2.5 graph factor between odometry and mapping
+* both are point-to-line and point-to-plane contraints
+* odometry uses two corresponding points as a line and three corresponding points as a plane
+* mapping uses many points to fit a line or a plane
+* 
+
 # 3. TODO
 
 ## 3.1 How to make the estimator more robust and accurate?
 - [x] cauchy loss for ceres optimization
 - [x] position result is negative of groundtruth
 - [x] drfit fast if noly edge point for constraints, add planar points for constraints
-- [ ] reduce drift, add feature maps
+- [x] reduce drift, add feature maps
 - [x] scale not accurate
 - [ ] test with more dataset
 - [ ] loop closure
 - [x] predictor before find correspondance
 - [ ] iteration for finding correspondence
 - [ ] trajectory evaluation
-- [ ] drift faster when rotating -- increase weight for edge contraints
-- [ ] select loss function
+- [x] drift faster when rotating -- increase weight for edge contraints
+- [x] select loss function
 - [x] record screen to gif
+- [ ] add colors for map
 
 
 ## 4. record screen with byzanz

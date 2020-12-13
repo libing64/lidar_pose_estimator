@@ -196,8 +196,10 @@ add_executable(plane_fitting_example  utest/plane_fitting_example.cpp)
 target_link_libraries(plane_fitting_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 
-add_executable(lidar_mapper_example  utest/lidar_mapper_example.cpp)
-target_link_libraries(lidar_mapper_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+
+add_executable(voxel_grid_example  utest/voxel_grid_example.cpp)
+target_link_libraries(voxel_grid_example ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+
 
 #############
 ## Install ##

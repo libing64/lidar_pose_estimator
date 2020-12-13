@@ -6,6 +6,7 @@
 #include <nav_msgs/Odometry.h>
 #include <Eigen/Eigen>
 #include "math_utils.h"
+#include <pcl/filters/voxel_grid.h>
 
 
 using namespace Eigen;
@@ -13,7 +14,7 @@ using namespace Eigen;
 class lidar_mapper
 {
 private:
-    double search_range = 0.5;
+    double search_range = 1.0;
 public:
     
 
@@ -266,15 +267,28 @@ void lidar_mapper::update_feature_map()
     cloud_transform(edge_points, g_edge_points, q, t);
     cloud_transform(planar_points, g_planar_points, q, t);
 
+    pcl::PointCloud<PointType> g_edge_points_filtered, g_planar_points_filtered;
+
+
+
+    double grid_size = 0.5;
+    pcl::VoxelGrid<PointType> sor;
+    sor.setInputCloud(g_edge_points.makeShared());
+    sor.setLeafSize(grid_size, grid_size, grid_size);
+    sor.filter(g_edge_points_filtered);
+
     //project features to current frame
-    for (auto i = 0; i < g_edge_points.size(); i++)
+    for (auto i = 0; i < g_edge_points_filtered.size(); i++)
     {
-        edge_point_map.points.push_back(g_edge_points.points[i]);
+        edge_point_map.points.push_back(g_edge_points_filtered.points[i]);
     }
 
-    for (auto i = 0; i < g_planar_points.size(); i++)
+    sor.setInputCloud(g_planar_points.makeShared());
+    sor.setLeafSize(grid_size, grid_size, grid_size);
+    sor.filter(g_planar_points_filtered);
+    for (auto i = 0; i < g_planar_points_filtered.size(); i++)
     {
-        planar_point_map.points.push_back(g_planar_points.points[i]);
+        planar_point_map.points.push_back(g_planar_points_filtered.points[i]);
     }
 }
 
