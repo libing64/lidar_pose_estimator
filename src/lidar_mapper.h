@@ -115,29 +115,16 @@ void lidar_mapper::predict(nav_msgs::Odometry &odom)
 
     if (is_odom_init)
     {
-        cout << "q: " << q.coeffs().transpose() << endl;
-        cout << "t: " << t.transpose() << endl;
-
         Quaterniond q1, q2;
         Vector3d t1, t2;
         odometry2transform(odom_prev, q1, t1);
         odometry2transform(odom, q2, t2);
-
-        cout << "q1: " << q1.coeffs().transpose() << endl;
-        cout << "t1: " << t1.transpose() << endl;
-
-        cout << "q2: " << q2.coeffs().transpose() << endl;
-        cout << "t2: " << t2.transpose() << endl;
 
         Quaterniond dq = q1.inverse() * q2;
         Vector3d dt = q1.inverse().toRotationMatrix() * (t2 - t1);
 
         t = t + q.toRotationMatrix() * dt;
         q = q * dq;
-
-
-        cout << "q: " << q.coeffs().transpose() << endl;
-        cout << "t: " << t.transpose() << endl;
     } else 
     {
         odometry2transform(odom, q, t);
@@ -302,7 +289,7 @@ void lidar_mapper::update(const sensor_msgs::PointCloud2ConstPtr &edge_points_ms
     cloud_transform(edge_points, g_edge_points, q, t);
     cloud_transform(planar_points, g_planar_points, q, t);
 
-    //transform_update();
+    transform_update();
 
     update_feature_map();
 
