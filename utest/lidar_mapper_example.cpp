@@ -43,8 +43,8 @@ int main(int argc, char** argv)
     lidar_mapper mapper;
     mapper.update(estimator.lidar_prev.edge_points_mapping, estimator.lidar_prev.planar_points_mapping);
 
-    mapper.qk = estimator.q;
-    mapper.tk = estimator.t;
+    mapper.q = estimator.q;
+    mapper.t = estimator.t;
     mapper.update(estimator.lidar.edge_points_mapping, estimator.lidar.planar_points_mapping);
 
     return 0;

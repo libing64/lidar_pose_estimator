@@ -33,10 +33,6 @@ public:
     //transform  from current frame to init frame
     Eigen::Quaterniond q;
     Eigen::Vector3d t;
-
-
-    Eigen::Quaterniond qk;
-    Eigen::Vector3d tk;
     double timestamp;
 
     lidar_mapper(/* args */);
@@ -64,8 +60,6 @@ lidar_mapper::lidar_mapper(/* args */)
 {
     q = Eigen::Quaterniond::Identity();
     t = Eigen::Vector3d::Zero();
-    qk = q;
-    tk = t;
 }
 
 lidar_mapper::~lidar_mapper()
@@ -129,13 +123,11 @@ void lidar_mapper::predict(nav_msgs::Odometry &odom)
         Quaterniond dq = q1.inverse() * q2;
         Vector3d dt = q.toRotationMatrix() * (t2 - t1);
 
-        qk = q * dq;
-        tk = t + dt;
+        q = q * dq;
+        t = t + dt;
     } else 
     {
         odometry2transform(odom, q, t);
-        qk = q;
-        tk = t;
         is_odom_init = true;
     }
 
@@ -264,18 +256,15 @@ void lidar_mapper::transform_update()
     dq.y() = qq[2];
     dq.z() = qq[3];
 
-    q = dq * qk;
-    t = dt + dq.toRotationMatrix() * tk;
-
-    qk = q;
-    tk = t;
+    q = dq * q;
+    t = dt + dq.toRotationMatrix() * t;
 }
 
 void lidar_mapper::update_feature_map()
 {
 
-    cloud_transform(edge_points, g_edge_points, qk, tk);
-    cloud_transform(planar_points, g_planar_points, qk, tk);
+    cloud_transform(edge_points, g_edge_points, q, t);
+    cloud_transform(planar_points, g_planar_points, q, t);
 
     //project features to current frame
     for (auto i = 0; i < g_edge_points.size(); i++)
@@ -297,8 +286,8 @@ void lidar_mapper::update(const sensor_msgs::PointCloud2ConstPtr &edge_points_ms
 
     readin_cloud_data(edge_points_msg, planar_points_msg);
 
-    cloud_transform(edge_points, g_edge_points, qk, tk);
-    cloud_transform(planar_points, g_planar_points, qk, tk);
+    cloud_transform(edge_points, g_edge_points, q, t);
+    cloud_transform(planar_points, g_planar_points, q, t);
 
     transform_update();
 
@@ -317,8 +306,8 @@ void lidar_mapper::update(pcl::PointCloud<PointType> &edge_cloud,
     edge_points = edge_cloud;
     planar_points = planar_cloud;
 
-    cloud_transform(edge_points, g_edge_points, qk, tk);
-    cloud_transform(planar_points, g_planar_points, qk, tk);
+    cloud_transform(edge_points, g_edge_points, q, t);
+    cloud_transform(planar_points, g_planar_points, q, t);
 
     transform_update();
 
