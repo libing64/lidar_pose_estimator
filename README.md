@@ -12,6 +12,8 @@
 ![kitti00](https://github.com/libing64/lidar_pose_estimator/blob/master/image/kitti00_lidar_pose_estimator.png) 
 ![kitti02](https://github.com/libing64/lidar_pose_estimator/blob/master/image/kitti02_lidar_pose_estimator.png) 
 ![kitti05](https://github.com/libing64/lidar_pose_estimator/blob/master/image/kitti05_lidar_pose_estimator.png) 
+![kitti00](https://github.com/libing64/lidar_pose_estimator/blob/master/image/kitti00_lidar_mapper.png) 
+
 
 ![image](https://github.com/libing64/lidar_pose_estimator/blob/master/image/lidar_pose_estimator.gif) 
 
