@@ -96,7 +96,7 @@ void publish_cloud(lidar_mapper &mapper)
 
     std_msgs::Header header;
     header.stamp = ros::Time(mapper.timestamp);
-    header.frame_id = "base_link";
+    header.frame_id = "odom";
 
     edge_points_msg.header = header;
     planar_points_msg.header = header;
