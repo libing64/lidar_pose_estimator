@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-    int n = 100;
+    int n = 10;
     // generate n points in the plane centered in p and spanned bu the u,v vectors.
     MatrixXd points_3D(3, n);
     Vector3d u = Vector3d::Random().normalized();

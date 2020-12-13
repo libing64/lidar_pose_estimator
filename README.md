@@ -205,7 +205,46 @@ Neighbors within radius search at (715.095 814.236 980.555) with radius=24.6792
 * both are point-to-line and point-to-plane contraints
 * odometry uses two corresponding points as a line and three corresponding points as a plane
 * mapping uses many points to fit a line or a plane
-* 
+
+
+## 2.5 plane fitting && line fitting
+* plane  = point + normal
+* line   = point + direction
+
+```
+void lidar_mapper::fit_plane(pcl::PointCloud<PointType> &cloud, Vector3d& center, Vector3d& normal)
+{
+    int n = cloud.points.size();
+    MatrixXd points = MatrixXd::Zero(3, n);
+    for (int i = 0; i < n; i++)
+    {
+        points.col(i) = point2eigen(cloud.points[i]);
+    }
+    center = points.rowwise().mean();
+    points.colwise() -= center;
+
+    JacobiSVD<MatrixXd> svd(points, ComputeFullU);
+    normal = svd.matrixU().col(2);
+
+    //cout << "center: " << center.transpose() << endl;
+    //cout << "normal: " << normal.transpose() << endl;
+}
+
+void lidar_mapper::fit_line(pcl::PointCloud<PointType> &cloud, Vector3d &center, Vector3d& u)
+{
+    int n = cloud.points.size();
+    MatrixXd points = MatrixXd::Zero(3, n);
+    for (int i = 0; i < n; i++)
+    {
+        points.col(i) = point2eigen(cloud.points[i]);
+    }
+    center = points.rowwise().mean();
+    points.colwise() -= center;
+    JacobiSVD<MatrixXd> svd(points, ComputeFullU);
+    u = svd.matrixU().col(0);
+}
+
+```
 
 # 3. TODO
 
